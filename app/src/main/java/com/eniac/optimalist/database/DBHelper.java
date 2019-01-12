@@ -14,9 +14,17 @@ import com.eniac.optimalist.database.model.ShoppingList;
 
 public class DBHelper extends SQLiteOpenHelper {
 
+    private static DBHelper sInstance;
     private static final String DATABASE_NAME = "optimalist.db";
 
-    public DBHelper(Context context) {
+    public static synchronized DBHelper getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new DBHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
+    private DBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
     }
 
