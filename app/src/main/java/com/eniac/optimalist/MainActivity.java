@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity
         addNotification();
          notificationManager = NotificationManagerCompat.from(this);
 
-        sendOnChannel1(null);
+        sendOnChannel(null,"Öneri:Hafta 4","Yumurta,Balık");
 
     }
 
@@ -106,9 +106,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void sendOnChannel1(View v) {
-        String title = "Example";
-        String message = "Example";
+    public void sendOnChannel(View v, String tempTitle,String tempMessage) {
+        String title = tempTitle;
+        String message = tempMessage;
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_1_ID)
                 .setSmallIcon(R.drawable.ic_launcher_background)
