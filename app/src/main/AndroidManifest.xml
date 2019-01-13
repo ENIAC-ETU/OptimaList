@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".LocationService" android:process=":location_service" />
+        <service android:name=".services.LocationService" android:process=":location_service" />
     </application>
 
 </manifest>

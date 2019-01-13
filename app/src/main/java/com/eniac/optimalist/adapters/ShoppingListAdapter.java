@@ -1,4 +1,4 @@
-package com.eniac.optimalist.view;
+package com.eniac.optimalist.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
