@@ -70,6 +70,15 @@ public class MainActivity extends AppCompatActivity
         });
 
 
+        FloatingActionButton fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showAddItemDialog();
+            }
+        });
+
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -284,6 +293,7 @@ public class MainActivity extends AppCompatActivity
      * when shouldUpdate=true, it automatically displays old shopping list and changes the
      * button text to UPDATE
      */
+    private void showAddItemDialog(){}
     private void showShoppingListDialog(final boolean shouldUpdate, final ShoppingList shoppingList, final int position) {
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
         View view = layoutInflaterAndroid.inflate(R.layout.shopping_list_dialog, null);
