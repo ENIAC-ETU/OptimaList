@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity
      * Delete - 0
      */
     private void showActionsDialog(final int position) {
-        CharSequence colors[] = new CharSequence[]{"Düzenle", "Sil"};
+        CharSequence colors[] = new CharSequence[]{"Düzenle", "Hatırlatıcı ekle", "Sil"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Bir seçenek seçiniz");
@@ -300,7 +300,10 @@ public class MainActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
                     showShoppingListDialog(true, shoppingLists.get(position), position);
-                } else {
+                }if (which == 1){
+// Bir sonraki hafta yapılacaktır.
+                }
+                else {
                     deleteShoppingList(position);
                 }
             }
