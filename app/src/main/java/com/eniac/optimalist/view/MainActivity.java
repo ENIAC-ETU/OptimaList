@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity
             toggleEmptyShoppingLists();
         }
     }
-
+    private void addItemToShoppingList(String item){}
     /**
      * Updating shopping list in db and updating
      * item in the list by its position
@@ -293,7 +293,45 @@ public class MainActivity extends AppCompatActivity
      * when shouldUpdate=true, it automatically displays old shopping list and changes the
      * button text to UPDATE
      */
-    private void showAddItemDialog(){}
+    private void showAddItemDialog() {
+        LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
+        View view = layoutInflaterAndroid.inflate(R.layout.add_item_dialog, null);
+
+        AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(MainActivity.this);
+        alertDialogBuilderUserInput.setView(view);
+
+        final EditText inputItemName = view.findViewById(R.id.add_item);
+        TextView dialogTitle = view.findViewById(R.id.add_item_dialog_title);
+        dialogTitle.setText(getString(R.string.new_item));
+
+
+
+        alertDialogBuilderUserInput
+                .setCancelable(false)
+                .setPositiveButton("kaydet", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogBox, int id) {
+
+                    }
+                })
+                .setNegativeButton("iptal",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialogBox, int id) {
+                                dialogBox.cancel();
+                            }
+                        });
+
+        final AlertDialog alertDialog = alertDialogBuilderUserInput.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+
+                addItemToShoppingList(inputItemName.getText().toString());
+            }
+        });
+    }
     private void showShoppingListDialog(final boolean shouldUpdate, final ShoppingList shoppingList, final int position) {
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
         View view = layoutInflaterAndroid.inflate(R.layout.shopping_list_dialog, null);

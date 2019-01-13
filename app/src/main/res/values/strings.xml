@@ -11,4 +11,8 @@
     <string name="lbl_new_shopping_list_title">Yeni Alışveriş Listesi</string>
     <string name="lbl_edit_shopping_list_title">Alışveriş Listesi Adını Değiştir</string>
     <string name="hint_enter_shopping_list_title">Alışveriş listesi adını giriniz!</string>
+
+
+    <string name="new_item">Yeni Ürün Ekle</string>
+    <string name="hint_enter_item_name">Eklenecek ürünün adını giriniz!</string>
 </resources>
