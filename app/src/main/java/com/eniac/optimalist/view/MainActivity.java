@@ -37,6 +37,14 @@ import com.eniac.optimalist.view.ShoppingListAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+
+import android.widget.Button;
+import android.app.NotificationChannel;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -88,10 +96,23 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         addNotification();
-         notificationManager = NotificationManagerCompat.from(this);
+        notificationManager = NotificationManagerCompat.from(this);
 
         sendOnChannel(null,"Öneri:Hafta 4","Yumurta,Balık");
+        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Granted","Permission is granted");
+        }
+        else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
 
+        if (checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Granted","Permission is granted");
+        }
+        else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        }
+        startService(new Intent(this, LocationService.class));    }
         shoppingLists.addAll(db.getAllShoppingLists());
         shoppingListAdapter = new ShoppingListAdapter(this, shoppingLists);
 
