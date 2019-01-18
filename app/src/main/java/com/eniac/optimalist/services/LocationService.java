@@ -1,5 +1,8 @@
 package com.eniac.optimalist.services;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +12,12 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
+
+import com.eniac.optimalist.MainActivity;
+import com.eniac.optimalist.R;
 
 import java.util.List;
 import java.util.Locale;
@@ -38,10 +46,19 @@ public class LocationService extends Service
             double mLatitude = location.getLatitude();
             double mLongitude = location.getLongitude();
             String p=getCompleteAddressString(mLatitude,mLongitude);
+            calculateDistance(location,location);
             Log.e(TAG, "onLocationChanged: " + p);
             mLastLocation.set(location);
         }
-        private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+        private boolean calculateDistance(Location A,Location B){
+            float distance=A.distanceTo(B);
+            if (distance <30){
+                setNotification(getApplicationContext(), "You are close to ...", "You are close to "+getCompleteAddressString(B.getLatitude(),B.getLongitude()), 1);
+                return true;
+            }
+            return false;
+        }
+        public  String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
             String strAdd = "";
             Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
             try {
@@ -123,7 +140,22 @@ public class LocationService extends Service
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
     }
+    public void setNotification(Context context, String notificationTitle, String notificationMessage, int notificationRequestCode) {
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(context,MainActivity.CHANNEL_1_ID)
+                        .setSmallIcon(R.drawable.ic_launcher_background)
+                        .setContentTitle(notificationTitle)
+                        .setColor(101)
+                        .setContentText(notificationMessage);
 
+        Intent intent = new Intent(context, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, notificationRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
+        Log.i(TAG, "notification sended");
+
+    }
     @Override
     public void onDestroy()
     {
