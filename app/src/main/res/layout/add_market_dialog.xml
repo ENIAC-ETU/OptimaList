@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/activity_margin"
+    android:paddingRight="@dimen/activity_margin"
+    android:paddingTop="@dimen/activity_margin">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dimen_10"
+        android:fontFamily="sans-serif-medium"
+        android:lineSpacingExtra="8sp"
+        android:text="Yeni Market"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/lbl_new_shopping_list_title"
+        android:textStyle="normal" />
+
+    <EditText
+        android:id="@+id/market"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:hint="Market adını giriniz!"
+        android:inputType="textCapSentences|textMultiLine"
+        android:lines="1"
+        android:textColorHint="@color/hint_enter_shopping_list_name"
+        android:textSize="@dimen/input_new_shopping_list" />
+
+</LinearLayout>

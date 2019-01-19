@@ -10,6 +10,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.eniac.optimalist.database.model.Market;
 import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.database.model.ReminderModel;
 
@@ -31,12 +32,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL(Market.CREATE_TABLE);
         db.execSQL(ShoppingList.CREATE_TABLE);
         db.execSQL(ReminderModel.CREATE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("drop table if exists " + Market.TABLE_NAME);
         db.execSQL("drop table if exists " + ShoppingList.TABLE_NAME);
         db.execSQL("drop table if exists " + ReminderModel.TABLE_NAME);
         onCreate(db);
@@ -56,7 +59,7 @@ public class DBHelper extends SQLiteOpenHelper {
         try (Cursor cursor = db.query(ShoppingList.TABLE_NAME, null, ShoppingList.COLUMN_ID + " = " + id, null, null, null, null)){
             if (cursor.moveToFirst()) {
                 shoppingList = new ShoppingList(
-                        cursor.getInt(cursor.getColumnIndex(ShoppingList.COLUMN_ID)),
+                        cursor.getLong(cursor.getColumnIndex(ShoppingList.COLUMN_ID)),
                         cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_TITLE)),
                         cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_CREATED_AT))
                 );
@@ -66,12 +69,11 @@ public class DBHelper extends SQLiteOpenHelper {
         return shoppingList;
     }
 
-    public int updateShoppingList(ShoppingList shoppingList) {
+    public long updateShoppingList(ShoppingList shoppingList) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(shoppingList.COLUMN_TITLE, shoppingList.getTitle());
-
         // updating row
         return db.update(ShoppingList.TABLE_NAME, values, ShoppingList.COLUMN_ID + " = " + shoppingList.getId(), null);
     }
@@ -89,7 +91,7 @@ public class DBHelper extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 do {
                     shoppingLists.add(new ShoppingList(
-                                    cursor.getInt(cursor.getColumnIndex(ShoppingList.COLUMN_ID)),
+                                    cursor.getLong(cursor.getColumnIndex(ShoppingList.COLUMN_ID)),
                                     cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_TITLE)),
                                     cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_CREATED_AT))
                             )
@@ -112,8 +114,6 @@ public class DBHelper extends SQLiteOpenHelper {
         // return count
         return count;
     }
-
-
 
     public long insertReminder(String title) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -184,5 +184,72 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // return count
         return count;
+    }
+
+    public long insertMarket(String title, double lat, double lng) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Market.COLUMN_TITLE, title);
+        contentValues.put(Market.COLUMN_LAT, lat);
+        contentValues.put(Market.COLUMN_LNG, lng);
+        return db.insert(Market.TABLE_NAME, null, contentValues);
+    }
+
+    public Market getMarket(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Market market = null;
+
+        try (Cursor cursor = db.query(Market.TABLE_NAME, null, Market.COLUMN_ID + " = " + id, null, null, null, null)){
+            if (cursor.moveToFirst()) {
+                market = new Market(
+                        cursor.getLong(cursor.getColumnIndex(Market.COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(Market.COLUMN_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(Market.COLUMN_CREATED_AT)),
+                        cursor.getDouble(cursor.getColumnIndex(Market.COLUMN_LAT)),
+                        cursor.getDouble(cursor.getColumnIndex(Market.COLUMN_LNG))
+                );
+            }
+        }
+
+        return market;
+    }
+
+    public List<Market> getAllMarkets() {
+        List<Market> markets = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        try (Cursor cursor = db.query(Market.TABLE_NAME, null, null, null, null, null, Market.COLUMN_CREATED_AT + " desc")){
+            if (cursor.moveToFirst()) {
+                do {
+                    markets.add(new Market(
+                                    cursor.getLong(cursor.getColumnIndex(Market.COLUMN_ID)),
+                                    cursor.getString(cursor.getColumnIndex(Market.COLUMN_TITLE)),
+                                    cursor.getString(cursor.getColumnIndex(Market.COLUMN_CREATED_AT)),
+                                    cursor.getDouble(cursor.getColumnIndex(Market.COLUMN_LAT)),
+                                    cursor.getDouble(cursor.getColumnIndex(Market.COLUMN_LNG))
+                            )
+                    );
+                } while (cursor.moveToNext());
+            }
+        }
+
+        return markets;
+    }
+
+    public int getMarketsCount() {
+        String countQuery = "select * from " + Market.TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+
+        int count = cursor.getCount();
+        cursor.close();
+
+        // return count
+        return count;
+    }
+
+    public boolean deleteMarket(Market market) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(Market.TABLE_NAME, Market.COLUMN_ID + " = " + market.getId(), null) > 0;
     }
 }
