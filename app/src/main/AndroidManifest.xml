@@ -32,6 +32,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".activities.ItemActivity"
+            android:label="@string/title_activity_item"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
         <service
             android:name=".services.LocationService"
             android:process=":location_service" />
@@ -50,8 +55,7 @@
         <activity
             android:name=".activities.MapsActivity"
             android:label="@string/title_activity_maps"
-            android:theme="@style/AppTheme"></activity>
-
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

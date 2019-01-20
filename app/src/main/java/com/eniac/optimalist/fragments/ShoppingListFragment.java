@@ -2,6 +2,7 @@ package com.eniac.optimalist.fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -18,7 +19,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.eniac.optimalist.MainActivity;
 import com.eniac.optimalist.R;
+import com.eniac.optimalist.activities.ItemActivity;
 import com.eniac.optimalist.adapters.ShoppingListAdapter;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ShoppingList;
@@ -30,11 +33,12 @@ import java.util.List;
 
 public class ShoppingListFragment extends Fragment {
 
-    private DBHelper db;
+    public static DBHelper db;
     private ShoppingListAdapter shoppingListAdapter;
     private List<ShoppingList> shoppingLists = new ArrayList<>();
     private RecyclerView recyclerView;
     private TextView noShoppingListView;
+    public static long currentPositionId;
 
     @Nullable
     @Override
@@ -60,13 +64,6 @@ public class ShoppingListFragment extends Fragment {
             }
         });
 
-        FloatingActionButton fab2 = (FloatingActionButton) view.findViewById(R.id.fab2);
-        fab2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showAddItemDialog();
-            }
-        });
 
         shoppingLists.addAll(db.getAllShoppingLists());
 
@@ -89,6 +86,9 @@ public class ShoppingListFragment extends Fragment {
                 recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, final int position) {
+                ShoppingList l = shoppingLists.get(position);
+                currentPositionId = l.getId();
+                showItems();
             }
 
             @Override
@@ -96,6 +96,13 @@ public class ShoppingListFragment extends Fragment {
                 showActionsDialog(position);
             }
         }));
+    }
+
+
+    public void showItems(){
+
+        Intent intent = new Intent(getContext(), ItemActivity.class);
+        startActivity(intent);
     }
 
     /**
