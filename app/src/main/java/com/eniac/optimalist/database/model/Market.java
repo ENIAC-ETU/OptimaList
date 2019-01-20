@@ -1,6 +1,8 @@
 package com.eniac.optimalist.database.model;
 
+
 public class Market {
+
     public static final String TABLE_NAME = "market";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_TITLE = "title";
@@ -53,5 +55,9 @@ public class Market {
 
     public double getLng() {
         return lng;
+    }
+
+    public String toString() {
+        return title;
     }
 }

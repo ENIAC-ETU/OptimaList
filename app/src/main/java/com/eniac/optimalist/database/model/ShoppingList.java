@@ -5,19 +5,17 @@ public class ShoppingList {
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_CREATED_AT = "created_at";
-    public static final String COLUMN_MARKET_ID = "market_id";
 
     private long id;
     private String title;
     private String createdAt;
-    private long marketId;
 
     public static final String CREATE_TABLE =
             "create table " + TABLE_NAME + "("
             + COLUMN_ID + " integer primary key autoincrement,"
             + COLUMN_TITLE + " text not null,"
             + COLUMN_CREATED_AT + " datetime default (DATETIME(CURRENT_TIMESTAMP, 'LOCALTIME'))"
-            //+ COLUMN_MARKET_ID + " integer default 0"
+           // + COLUMN_MARKET_ID + " integer default null,"
             //+ "foreign key " + COLUMN_MARKET_ID + " references " + Market.COLUMN_ID
             + ")";
     
@@ -41,9 +39,5 @@ public class ShoppingList {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public long getMarketId() {
-        return marketId;
     }
 }
