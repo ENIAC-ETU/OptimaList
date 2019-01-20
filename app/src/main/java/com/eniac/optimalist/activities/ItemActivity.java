@@ -22,8 +22,10 @@ import com.eniac.optimalist.R;
 import com.eniac.optimalist.adapters.ItemListAdapter;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ItemList;
+import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.fragments.ShoppingListFragment;
 import com.eniac.optimalist.utils.DividerItemDecoration;
+import com.eniac.optimalist.utils.RecyclerTouchListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,13 +79,54 @@ public class ItemActivity extends AppCompatActivity {
 
         toggleEmptyItemLists();
 
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(ItemActivity.this,
+                recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, final int position) {
+                showActionsDialog(position);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
 
 
 
     }
 
     //-------------------------------------------------------------------------------------------------------------
+    private void showActionsDialog(final int position) {
+        CharSequence colors[] = new CharSequence[]{"Hatırlatıcı ekle", "Sil"};
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
+        builder.setTitle("Bir seçenek seçiniz");
+        builder.setItems(colors, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+
+                }
+                else {
+                    deleteItem(position);
+                }
+
+            }
+        });
+        builder.show();
+    }
+
+    private void deleteItem(int position) {
+        // deleting the shopping list from db
+        db.deleteItem(itemLists.get(position));
+
+        // removing the shopping list from the list
+        itemLists.remove(position);
+        itemListAdapter.notifyItemRemoved(position);
+
+        toggleEmptyItemLists();
+    }
 
     private void showAddItemDialog() {
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
