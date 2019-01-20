@@ -10,6 +10,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.eniac.optimalist.database.model.ItemList;
 import com.eniac.optimalist.database.model.Market;
 import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.database.model.ReminderModel;
@@ -35,6 +36,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(Market.CREATE_TABLE);
         db.execSQL(ShoppingList.CREATE_TABLE);
         db.execSQL(ReminderModel.CREATE_TABLE);
+        db.execSQL(ItemList.CREATE_TABLE);
+
     }
 
     @Override
@@ -42,6 +45,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("drop table if exists " + Market.TABLE_NAME);
         db.execSQL("drop table if exists " + ShoppingList.TABLE_NAME);
         db.execSQL("drop table if exists " + ReminderModel.TABLE_NAME);
+        db.execSQL("drop table if exists " + ItemList.TABLE_NAME);
         onCreate(db);
     }
 
@@ -251,5 +255,91 @@ public class DBHelper extends SQLiteOpenHelper {
     public boolean deleteMarket(Market market) {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(Market.TABLE_NAME, Market.COLUMN_ID + " = " + market.getId(), null) > 0;
+    }
+
+    public long insertItemList(String title, long currentPositionId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ItemList.COLUMN_TITLE, title);
+        contentValues.put(ItemList.COLUMN_SHOPPING_LIST_ID,currentPositionId);
+        return db.insert(ItemList.TABLE_NAME, null, contentValues);
+    }
+
+    public ItemList getItemList(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ItemList itemList = null;
+
+        try (Cursor cursor = db.query(ItemList.TABLE_NAME, null ,ItemList.COLUMN_ID + " = " + id, null, null, null, null)){
+            if (cursor.moveToFirst()) {
+                itemList = new ItemList(
+                        cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CREATED_AT)),
+                        cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_SHOPPING_LIST_ID))
+
+
+                );
+            }
+        }
+
+        return itemList;
+    }
+
+
+
+
+    public List<ItemList> getAllItemLists() {
+        List<ItemList> itemLists = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        try (Cursor cursor = db.query(ItemList.TABLE_NAME, null, null, null, null, null, ItemList.COLUMN_CREATED_AT + " desc")){
+            if (cursor.moveToFirst()) {
+                do {
+                    itemLists.add(new ItemList(
+                                    cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_ID)),
+                                    cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)),
+                                    cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CREATED_AT)),
+                                    cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_SHOPPING_LIST_ID))
+                            )
+                    );
+                } while (cursor.moveToNext());
+            }
+        }
+
+        return itemLists;
+    }
+
+
+    public List<ItemList> getCurrentItems(long shoppingListId) {
+        List<ItemList> itemLists = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        try (Cursor cursor = db.query(ItemList.TABLE_NAME, null, ItemList.COLUMN_SHOPPING_LIST_ID + " = " + shoppingListId, null, null, null, ItemList.COLUMN_CREATED_AT + " desc")){
+            if (cursor.moveToFirst()) {
+                do {
+                    itemLists.add(new ItemList(
+                                    cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_ID)),
+                                    cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)),
+                                    cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CREATED_AT)),
+                                    cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_SHOPPING_LIST_ID))
+                            )
+                    );
+                } while (cursor.moveToNext());
+            }
+        }
+
+        return itemLists;
+    }
+
+    public int getItemListsCount() {
+        String countQuery = "select * from " + ItemList.TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+
+        int count = cursor.getCount();
+        cursor.close();
+
+        // return count
+        return count;
     }
 }
