@@ -87,6 +87,11 @@ public class DBHelper extends SQLiteOpenHelper {
         return db.delete(ShoppingList.TABLE_NAME, ShoppingList.COLUMN_ID + " = " + shoppingList.getId(), null) > 0;
     }
 
+    public boolean deleteItem(ItemList itemList) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(ItemList.TABLE_NAME, ItemList.COLUMN_ID + " = " + itemList.getId(), null) > 0;
+    }
+
     public List<ShoppingList> getAllShoppingLists() {
         List<ShoppingList> shoppingLists = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
