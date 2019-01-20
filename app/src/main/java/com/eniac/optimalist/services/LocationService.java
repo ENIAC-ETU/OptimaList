@@ -1,6 +1,5 @@
 package com.eniac.optimalist.services;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -11,14 +10,17 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.View;
 
 import com.eniac.optimalist.MainActivity;
 import com.eniac.optimalist.R;
+import com.eniac.optimalist.database.DBHelper;
+import com.eniac.optimalist.database.model.Market;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,10 +30,14 @@ public class LocationService extends Service
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 100;
     private static final float LOCATION_DISTANCE = 0;
-
+    private DBHelper db;
+    private static List<Market> marketList=new ArrayList<>();
+    public static Location mLastLocation;
+    private static Market lastClosest =null;
+    private boolean changed=true;
+    private static final double  distanceLimit=1000;
     private class LocationListener implements android.location.LocationListener
     {
-        Location mLastLocation;
 
         public LocationListener(String provider)
         {
@@ -41,19 +47,33 @@ public class LocationService extends Service
         }
 
         @Override
-        public void onLocationChanged(Location location)
-        {
+        public void onLocationChanged(Location location) {
             double mLatitude = location.getLatitude();
             double mLongitude = location.getLongitude();
-            String p=getCompleteAddressString(mLatitude,mLongitude);
-            calculateDistance(location,location);
-            Log.e(TAG, "onLocationChanged: " + p);
-            mLastLocation.set(location);
+
+            if (mLastLocation != null && mLastLocation.getLatitude() != mLatitude && mLastLocation.getLongitude() != mLongitude) {
+                String p = getCompleteAddressString(mLatitude, mLongitude);
+
+                Log.e(TAG, "onLocation:"  + p);
+                mLastLocation.set(location);
+            }
+
+            if (lastClosest != null && changed!=false) {
+                calculateDistance(location, lastClosest);
+
+            }
+            else
+                Log.d(TAG,"tempisnull");
+
         }
-        private boolean calculateDistance(Location A,Location B){
+        private boolean calculateDistance(Location A,Market lastClosest){
+            Location B=new Location("new");
+            B.setLatitude(lastClosest.getLat());
+            B.setLongitude(lastClosest.getLng());
             float distance=A.distanceTo(B);
-            if (distance <30){
-                setNotification(getApplicationContext(), "You are close to ...", "You are close to "+getCompleteAddressString(B.getLatitude(),B.getLongitude()), 1);
+            if (distance <distanceLimit){
+                setNotification(getApplicationContext(), "You are close to ...", "You are close to "+lastClosest.getTitle(), 1);
+                changed=false;
                 return true;
             }
             return false;
@@ -100,6 +120,26 @@ public class LocationService extends Service
         }
     }
 
+    public static Market orderMarketList() {
+        double min=1000;
+        int index=-1;
+        Location newLocation=new Location("newlocation");
+        Log.d(TAG,"orderMarketList");
+        for (int i=0;i<marketList.size();i++){
+            newLocation.setLatitude(marketList.get(i).getLat());
+            newLocation.setLongitude(marketList.get(i).getLng());
+            double tempMin=mLastLocation.distanceTo(newLocation);
+            if (min>tempMin && tempMin<distanceLimit){
+                    min=tempMin;
+                    index=i;
+            }
+        }
+        if (index!=-1){
+            return marketList.get(index);
+        }
+        return null;
+    }
+
     LocationListener[] mLocationListeners = new LocationListener[] {
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER)
@@ -114,9 +154,29 @@ public class LocationService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
+        db = DBHelper.getInstance(getApplicationContext());
         onCreate();
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
+
+        final Handler handler = new Handler();
+        final int delay = 60000; //milliseconds
+
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                //do something
+                marketList = db.getAllMarkets();
+                Market templastClosest =orderMarketList();
+                if (lastClosest!=null && templastClosest!=null && templastClosest.getTitle().equals(lastClosest.getTitle())){
+                    Log.d(TAG,"didn't changed");
+                }else{
+                    lastClosest=templastClosest;
+                    Log.d(TAG,"did changed");
+                    changed=true;
+                }
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
         return START_STICKY;
     }
 
