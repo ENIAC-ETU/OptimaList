@@ -35,6 +35,7 @@ public class LocationService extends Service
     public static Location mLastLocation;
     private static Market lastClosest =null;
     private boolean changed=true;
+    final Handler handler = new Handler();
     private static final double  distanceLimit=1000;
     private class LocationListener implements android.location.LocationListener
     {
@@ -159,7 +160,6 @@ public class LocationService extends Service
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
 
-        final Handler handler = new Handler();
         final int delay = 60000; //milliseconds
 
         handler.postDelayed(new Runnable(){
@@ -221,6 +221,7 @@ public class LocationService extends Service
     {
         Log.e(TAG, "onDestroy");
         super.onDestroy();
+        handler.removeMessages(0);
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {

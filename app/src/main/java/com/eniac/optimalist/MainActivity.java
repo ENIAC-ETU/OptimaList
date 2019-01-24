@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer;
     private RecyclerView recyclerView;
     private TextView noShoppingListView;
-
+    private boolean serviceStatus=true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity
         else {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         }
-        startService(new Intent(this, LocationService.class));
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame, new ShoppingListFragment());
@@ -162,7 +161,15 @@ public class MainActivity extends AppCompatActivity
 
         notificationManager.notify(1, notification);
     }
-
+    private void stopLocationService(){
+        if (serviceStatus){
+            serviceStatus=false;
+            stopService(new Intent(this, LocationService.class));
+        }else{
+            serviceStatus=true;
+            startService(new Intent(this, LocationService.class));
+        }
+    }
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
