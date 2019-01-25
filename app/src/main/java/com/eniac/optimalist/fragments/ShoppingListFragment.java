@@ -39,6 +39,7 @@ public class ShoppingListFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView noShoppingListView;
     public static long currentPositionId;
+    public static String currentShoppingListTitle;
 
     @Nullable
     @Override
@@ -88,6 +89,7 @@ public class ShoppingListFragment extends Fragment {
             public void onClick(View view, final int position) {
                 ShoppingList l = shoppingLists.get(position);
                 currentPositionId = l.getId();
+                currentShoppingListTitle = l.getTitle();
                 showItems();
             }
 

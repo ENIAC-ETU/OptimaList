@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -42,12 +43,17 @@ public class ItemActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_item2);
         db = DBHelper.getInstance(this);
         recyclerView = findViewById(R.id.recycler_view);
         noItemListView = findViewById(R.id.empty_item_lists_view);
 
         markets.addAll(db.getAllMarkets());
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
+        toolbar.setTitle(ShoppingListFragment.currentShoppingListTitle);
+        setSupportActionBar(toolbar);
 
         FloatingActionButton fab_add_item = (FloatingActionButton) findViewById(R.id.fab_add_item);
         fab_add_item.setOnClickListener(new View.OnClickListener() {
