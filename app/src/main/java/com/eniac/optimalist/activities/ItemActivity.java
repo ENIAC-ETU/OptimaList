@@ -98,7 +98,7 @@ public class ItemActivity extends AppCompatActivity {
 
     //-------------------------------------------------------------------------------------------------------------
     private void showActionsDialog(final int position) {
-        CharSequence colors[] = new CharSequence[]{"Hatırlatıcı ekle", "Sil"};
+        CharSequence colors[] = new CharSequence[]{"Hatırlatıcı ekle", "Ürünü Sil", "Tüm alışveriş listelerinden ürünü sil"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
         builder.setTitle("Bir seçenek seçiniz");
@@ -108,8 +108,11 @@ public class ItemActivity extends AppCompatActivity {
                 if (which == 0) {
 
                 }
-                else {
+                else if (which == 1) {
                     deleteItem(position);
+                }
+                else{
+                    deleteItemFromAllShoppingLists(position);
                 }
 
             }
@@ -118,15 +121,45 @@ public class ItemActivity extends AppCompatActivity {
     }
 
     private void deleteItem(int position) {
-        // deleting the shopping list from db
+
         db.deleteItem(itemLists.get(position));
 
-        // removing the shopping list from the list
         itemLists.remove(position);
         itemListAdapter.notifyItemRemoved(position);
 
         toggleEmptyItemLists();
     }
+
+
+    private void deleteItemFromAllShoppingLists(int position) {
+
+
+        List<ItemList> allItems;
+        allItems = db.getAllItemLists();
+
+        String current_item_title = itemLists.get(position).getTitle();
+
+
+
+        int i = 0;
+        while(allItems.size()>i) {
+            ItemList item = allItems.get(i);
+
+            if (item.getTitle().equalsIgnoreCase(current_item_title)){
+                db.deleteItem(item);
+            }
+            i++;
+
+        }
+
+
+
+
+        itemLists.remove(position);
+        itemListAdapter.notifyItemRemoved(position);
+        toggleEmptyItemLists();
+    }
+
 
     private void showAddItemDialog() {
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
