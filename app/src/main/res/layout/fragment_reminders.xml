@@ -23,7 +23,7 @@
         android:textSize="@dimen/msg_no_shopping_lists" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fab_create_reminder"
         srcCompat="@android:drawable/ic_input_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

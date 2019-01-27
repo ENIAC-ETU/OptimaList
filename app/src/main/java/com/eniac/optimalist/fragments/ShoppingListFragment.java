@@ -324,14 +324,4 @@ public class ShoppingListFragment extends Fragment {
         }
     }
 
-    private void deleteReminder(int position) {
-        // deleting the reminder from db
-        db.deleteReminder(reminderModelList.get(position));
-
-        // removing the reminder from the list
-        reminderModelList.remove(position);
-        //reminderAdapter.notifyItemRemoved(position);
-
-        //toggleEmptyReminder();
-    }
 }

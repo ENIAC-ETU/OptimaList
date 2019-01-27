@@ -19,4 +19,6 @@
     <string name="title_activity_item">ItemActivity</string>
     <string name="msg_no_item_list">Listede ürün bulunamadı!</string>
 
+    <string name="reminder">Hatırlatıcı Başlığı</string>
+
 </resources>

@@ -14,10 +14,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.eniac.optimalist.R;
 import com.eniac.optimalist.database.DBHelper;
+import com.eniac.optimalist.database.model.Market;
 import com.eniac.optimalist.database.model.ReminderModel;
 import com.eniac.optimalist.utils.DividerItemDecoration;
 import com.eniac.optimalist.utils.RecyclerTouchListener;
@@ -32,6 +36,7 @@ public class ReminderFragment extends Fragment {
     private DBHelper db;
     private ReminderAdapter reminderAdapter;
     private List<ReminderModel> reminders = new ArrayList<>();
+    private List<Market> markets = new ArrayList<>();
     private RecyclerView recyclerView;
     private TextView noReminderView;
     final int RESULT_OK = 1;
@@ -40,6 +45,7 @@ public class ReminderFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_reminders, container, false);
+
     }
 
     @Override
@@ -52,16 +58,17 @@ public class ReminderFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view);
         noReminderView = view.findViewById(R.id.empty_reminder_view);
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab_create_reminder = (FloatingActionButton) getActivity().findViewById(R.id.fab_create_reminder);
+        fab_create_reminder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //showMarketDialog(false, null, -1);
-                //startActivityForResult(new Intent(getContext(), MapsActivity.class), RESULT_OK);
+                showReminderDialog(false,0);
             }
         });
 
+
         reminders.addAll(db.getAllReminders());
+        markets.addAll(db.getAllMarkets());
 
         reminderAdapter = new ReminderAdapter(getActivity(), reminders);
 
@@ -106,6 +113,40 @@ public class ReminderFragment extends Fragment {
         toggleEmptyReminders();
     }
 
+    private void createReminder(String title) {
+        // inserting reminder for shopping list in db and getting
+        // newly inserted reminder id
+        long id = db.insertReminder(title);
+
+        // get the newly inserted reminder from db
+        ReminderModel r= db.getReminder(id);
+
+        if (r != null) {
+            // adding new reminder to array list at 0 position
+            reminders.add(0, r);
+
+            // refreshing the list
+            reminderAdapter.notifyDataSetChanged();
+
+            toggleEmptyReminders();
+        }
+    }
+
+    private void updateReminder(String title, int position) {
+        ReminderModel r = reminders.get(position);
+        // updating reminder title
+        r.setTitle(title);
+
+        // updating note in db
+        db.updateReminder(r);
+
+        // refreshing the list
+        reminders.set(position, r);
+        reminderAdapter.notifyItemChanged(position);
+
+        toggleEmptyReminders();
+    }
+
     /**
      * Opens dialog with Edit - Delete options
      * Edit - 0
@@ -120,7 +161,7 @@ public class ReminderFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
-                    //showMarketDialog(true, markets.get(position), position);
+                    showReminderDialog(true, position);
                 }
                 else {
                     deleteReminder (position);
@@ -128,6 +169,53 @@ public class ReminderFragment extends Fragment {
             }
         });
         builder.show();
+    }
+
+    private void showReminderDialog(final boolean shouldUpdate, final int position) {
+        LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getActivity().getApplicationContext());
+        View view = layoutInflaterAndroid.inflate(R.layout.add_reminder_dialog, null);
+
+        Spinner spinner = (Spinner) view.findViewById(R.id.rem_markets_spinner);
+        ArrayAdapter<Market> dataAdapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, markets);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(dataAdapter);
+
+        AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this.getActivity());
+        alertDialogBuilderUserInput.setView(view);
+
+        final EditText title = view.findViewById(R.id.reminder);
+
+        TextView dialogTitle = view.findViewById(R.id.rem_dialog_title);
+        dialogTitle.setText(getContext().getString(R.string.reminder));
+
+        alertDialogBuilderUserInput
+                .setCancelable(false)
+                .setPositiveButton("kaydet", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogBox, int id) {
+                        createReminder("asd");
+                    }
+                })
+                .setNegativeButton("iptal",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialogBox, int id) {
+                                dialogBox.cancel();
+                            }
+                        });
+
+        final AlertDialog alertDialog = alertDialogBuilderUserInput.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(shouldUpdate)
+                    updateReminder(title.getText().toString(),position);
+                else
+                    createReminder(title.getText().toString());
+                alertDialog.dismiss();
+
+            }
+        });
     }
 
     /**
