@@ -1,19 +1,12 @@
 package com.eniac.optimalist;
 
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.provider.Settings;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,23 +18,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.app.NotificationManager;
 import android.support.v4.app.NotificationCompat;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.eniac.optimalist.activities.MapsActivity;
 import com.eniac.optimalist.database.DBHelper;
-import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.fragments.MarketFragment;
 import com.eniac.optimalist.fragments.ReminderFragment;
 import com.eniac.optimalist.fragments.ShoppingListFragment;
-import com.eniac.optimalist.utils.DividerItemDecoration;
-import com.eniac.optimalist.utils.RecyclerTouchListener;
 import com.eniac.optimalist.services.LocationService;
-import com.eniac.optimalist.adapters.ShoppingListAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import android.Manifest;
 import android.content.Intent;
@@ -53,17 +35,19 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public static final String CHANNEL_1_ID = "Channel 1";
     NotificationManagerCompat notificationManager;
-    private DBHelper db;
-    private ShoppingListAdapter shoppingListAdapter;
-    private List<ShoppingList> shoppingLists = new ArrayList<>();
+    DBHelper db;
     private DrawerLayout drawer;
-    private RecyclerView recyclerView;
-    private TextView noShoppingListView;
     private boolean serviceStatus=true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (!isLocationEnabled()) {
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intent);
+        }
 
         db = DBHelper.getInstance(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -198,4 +182,17 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public boolean isLocationEnabled() {
+        int locationMode = 0;
+        String locationProviders;
+
+        try {
+            locationMode = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+        return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+    }
+
 }
