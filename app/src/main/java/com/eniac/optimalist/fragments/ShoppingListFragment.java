@@ -24,6 +24,7 @@ import com.eniac.optimalist.R;
 import com.eniac.optimalist.activities.ItemActivity;
 import com.eniac.optimalist.adapters.ShoppingListAdapter;
 import com.eniac.optimalist.database.DBHelper;
+import com.eniac.optimalist.database.model.ReminderModel;
 import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.utils.DividerItemDecoration;
 import com.eniac.optimalist.utils.RecyclerTouchListener;
@@ -40,6 +41,7 @@ public class ShoppingListFragment extends Fragment {
     private TextView noShoppingListView;
     public static long currentPositionId;
     public static String currentShoppingListTitle;
+    private List<ReminderModel> reminderModelList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -181,7 +183,7 @@ public class ShoppingListFragment extends Fragment {
                     showShoppingListDialog(true, shoppingLists.get(position), position);
                 }
                 else if (which == 1){
-// Bir sonraki hafta yapılacaktır.
+                    createReminder("title");
                 }
                 else {
                     deleteShoppingList(position);
@@ -301,5 +303,35 @@ public class ShoppingListFragment extends Fragment {
                 addItemToShoppingList(inputItemName.getText().toString());
             }
         });
+    }
+
+    private void createReminder(String title) {
+        // inserting reminder for shopping list in db and getting
+        // newly inserted reminder id
+        long id = db.insertReminder(title);
+
+        // get the newly inserted reminder from db
+        ReminderModel r= db.getReminder(id);
+
+        if (r != null) {
+            // adding new reminder to array list at 0 position
+            reminderModelList.add(0, r);
+
+            // refreshing the list
+            //reminderAdapter.notifyDataSetChanged();
+
+            //toggleEmptyReminders();
+        }
+    }
+
+    private void deleteReminder(int position) {
+        // deleting the reminder from db
+        db.deleteReminder(reminderModelList.get(position));
+
+        // removing the reminder from the list
+        reminderModelList.remove(position);
+        //reminderAdapter.notifyItemRemoved(position);
+
+        //toggleEmptyReminder();
     }
 }
