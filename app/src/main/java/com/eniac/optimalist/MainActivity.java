@@ -33,6 +33,7 @@ import com.eniac.optimalist.activities.MapsActivity;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.fragments.MarketFragment;
+import com.eniac.optimalist.fragments.ReminderFragment;
 import com.eniac.optimalist.fragments.ShoppingListFragment;
 import com.eniac.optimalist.utils.DividerItemDecoration;
 import com.eniac.optimalist.utils.RecyclerTouchListener;
@@ -182,8 +183,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_markets) {
             //startActivity(new Intent(this, MapsActivity.class));
             ft.replace(R.id.content_frame, new MarketFragment());
-        } else if (id == R.id.nav_slideshow) {
-
+        } else if (id == R.id.nav_reminders) {
+            ft.replace(R.id.content_frame, new ReminderFragment());
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
