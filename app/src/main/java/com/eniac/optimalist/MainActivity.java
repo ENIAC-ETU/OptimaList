@@ -93,7 +93,8 @@ public class MainActivity extends AppCompatActivity
         else {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         }
-
+        if (serviceStatus)
+            startService(new Intent(this, LocationService.class));
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame, new ShoppingListFragment());
         ft.commit();

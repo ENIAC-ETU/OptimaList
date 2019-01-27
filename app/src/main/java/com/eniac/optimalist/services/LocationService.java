@@ -1,7 +1,7 @@
 package com.eniac.optimalist.services;
 
+
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -12,11 +12,9 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.eniac.optimalist.MainActivity;
-import com.eniac.optimalist.R;
+import com.eniac.optimalist.NotificationSystem;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.Market;
 
@@ -32,11 +30,17 @@ public class LocationService extends Service
     private static final float LOCATION_DISTANCE = 0;
     private DBHelper db;
     private static List<Market> marketList=new ArrayList<>();
-    public static Location mLastLocation;
+    private final static  Location mLastLocation=new Location("gps");
     private static Market lastClosest =null;
     private boolean changed=true;
     final Handler handler = new Handler();
     private static final double  distanceLimit=1000;
+    private static NotificationSystem notify= NotificationSystem.getInstance();
+    public static  Location getLastLocation(){ //get the last location
+        if (mLastLocation!=null)
+        return mLastLocation;
+        return null;
+    }
     private class LocationListener implements android.location.LocationListener
     {
 
@@ -44,7 +48,6 @@ public class LocationService extends Service
         {
             Log.e(TAG, "LocationListener " + provider);
 
-            mLastLocation = new Location(provider);
         }
 
         @Override
@@ -54,9 +57,13 @@ public class LocationService extends Service
 
             if (mLastLocation != null && mLastLocation.getLatitude() != mLatitude && mLastLocation.getLongitude() != mLongitude) {
                 String p = getCompleteAddressString(mLatitude, mLongitude);
+                if(mLastLocation!=null)
+                Log.e(TAG, "LastLocation:"  + getCompleteAddressString(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                mLastLocation.set(location);
 
                 Log.e(TAG, "onLocation:"  + p);
-                mLastLocation.set(location);
+
+
             }
 
             if (lastClosest != null && changed!=false) {
@@ -73,7 +80,7 @@ public class LocationService extends Service
             B.setLongitude(lastClosest.getLng());
             float distance=A.distanceTo(B);
             if (distance <distanceLimit){
-                setNotification(getApplicationContext(), "You are close to ...", "You are close to "+lastClosest.getTitle(), 1);
+                notify.setNotification(getApplicationContext(), "You are close to ...", "You are close to "+lastClosest.getTitle(), 1);
                 changed=false;
                 return true;
             }
@@ -200,21 +207,11 @@ public class LocationService extends Service
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
     }
-    public void setNotification(Context context, String notificationTitle, String notificationMessage, int notificationRequestCode) {
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(context,MainActivity.CHANNEL_1_ID)
-                        .setSmallIcon(R.drawable.ic_launcher_background)
-                        .setContentTitle(notificationTitle)
-                        .setColor(101)
-                        .setContentText(notificationMessage);
-
-        Intent intent = new Intent(context, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, notificationRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, builder.build());
-        Log.i(TAG, "notification sended");
-
+    public void triggerLocationUpdate(){
+        Location loc = new Location("gps");
+        loc.setLatitude(13.32); // just mock values
+        loc.setLongitude(13.32);
+        mLocationManager.setTestProviderLocation("gps", loc);
     }
     @Override
     public void onDestroy()
