@@ -2,8 +2,12 @@ package com.eniac.optimalist;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationManagerCompat;
@@ -30,16 +34,36 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.CheckBox;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public static final String CHANNEL_1_ID = "Channel 1";
+    LocationService mService;
     NotificationManagerCompat notificationManager;
     DBHelper db;
     private DrawerLayout drawer;
     private boolean serviceStatus=true;
+    public static Intent locationIntent;
+    boolean mBound = false;
+    private ServiceConnection mConnection = new ServiceConnection() {
 
-    @Override
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
+            MainActivity.this.mService = (LocationService) binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
+        @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -53,18 +77,17 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         addNotification();
         notificationManager = NotificationManagerCompat.from(this);
-
-        //sendOnChannel(null,"Öneri:Hafta 4","Yumurta,Balık");
+        locationIntent=new Intent(this,LocationService.class);
+        bindService(locationIntent, mConnection, Context.BIND_AUTO_CREATE);
         if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.d("Granted","Permission is granted");
         }
@@ -78,12 +101,15 @@ public class MainActivity extends AppCompatActivity
         else {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         }
-        if (serviceStatus)
-            startService(new Intent(this, LocationService.class));
+        if (serviceStatus) {
+            startService(locationIntent);
+            Log.d("MyLocation:","hey");
+        }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame, new ShoppingListFragment());
         ft.commit();
     }
+
 
     @Override
     public void onBackPressed() {
@@ -147,13 +173,13 @@ public class MainActivity extends AppCompatActivity
 
         notificationManager.notify(1, notification);
     }
-    private void stopLocationService(){
+    public void changeLocationServiceStatus(){
         if (serviceStatus){
             serviceStatus=false;
-            stopService(new Intent(this, LocationService.class));
+            stopService(locationIntent);
         }else{
             serviceStatus=true;
-            startService(new Intent(this, LocationService.class));
+            startService(locationIntent);
         }
     }
     @SuppressWarnings("StatementWithEmptyBody")

@@ -9,6 +9,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -28,6 +29,7 @@ public class LocationService extends Service
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 100;
     private static final float LOCATION_DISTANCE = 0;
+    private final IBinder mBinder = new LocalBinder();
     private DBHelper db;
     private static List<Market> marketList=new ArrayList<>();
     private final static  Location mLastLocation=new Location("gps");
@@ -40,6 +42,12 @@ public class LocationService extends Service
         if (mLastLocation!=null)
         return mLastLocation;
         return null;
+    }
+    public class LocalBinder extends Binder {
+        public LocationService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return LocationService.this;
+        }
     }
     private class LocationListener implements android.location.LocationListener
     {
@@ -154,9 +162,8 @@ public class LocationService extends Service
     };
 
     @Override
-    public IBinder onBind(Intent arg0)
-    {
-        return null;
+    public IBinder onBind(Intent intent) {
+        return mBinder;
     }
 
     @Override

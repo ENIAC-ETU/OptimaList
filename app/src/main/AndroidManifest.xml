@@ -23,6 +23,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
+            android:process=":location"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -39,7 +40,8 @@
 
         <service
             android:name=".services.LocationService"
-            android:process=":location_service" />
+            android:process=":location"
+            />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

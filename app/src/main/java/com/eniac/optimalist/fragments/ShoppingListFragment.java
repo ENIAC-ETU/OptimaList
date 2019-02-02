@@ -12,9 +12,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,13 +44,31 @@ public class ShoppingListFragment extends Fragment {
     public static long currentPositionId;
     public static String currentShoppingListTitle;
     private List<ReminderModel> reminderModelList = new ArrayList<>();
-
+CheckBox location_box;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_shopping_lists, container, false);
+        View root = inflater.inflate(R.layout.fragment_shopping_lists, container, false);
+        location_box = (CheckBox) root.findViewById(R.id.checkbox);
+        checkLocationBox();
+        return root;
     }
+    private void checkLocationBox(){
+        Log.d("MyLocation:",(location_box==null)+"");
+        location_box.setChecked(true);
+        location_box.setOnClickListener(new View.OnClickListener() {
 
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)getActivity()).changeLocationServiceStatus();
+                if(location_box.isChecked()){
+                    Log.d("MyLocation:","Checked");
+                }else{
+                    Log.d("MyLocation:","Un-Checked");
+                }
+            }
+        });
+    }
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
