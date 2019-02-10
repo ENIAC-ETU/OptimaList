@@ -13,7 +13,8 @@ import android.widget.ImageView;
 import com.eniac.optimalist.R;
 
 public class ImageActivity extends AppCompatActivity {
-    Button btn;
+    Button btn_gallery;
+    Button btn_camera;
     public static final int SELECT_PICTURE=1;
     private String selectedImagePath;
     ImageView img;
@@ -21,9 +22,10 @@ public class ImageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image2);
-        btn = (Button) findViewById(R.id.button_image);
+        btn_gallery = (Button) findViewById(R.id.button_image);
+        btn_camera = (Button) findViewById(R.id.button_camera);
         img= (ImageView) findViewById(R.id.imageView);
-        btn.setOnClickListener(new View.OnClickListener() {
+        btn_gallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
@@ -33,6 +35,15 @@ public class ImageActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
             }
         });
+
+        btn_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+
     }
     @Override
 
