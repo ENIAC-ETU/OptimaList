@@ -32,10 +32,11 @@ public class RecommendationService {
 
     public void initializeShoppingListToMap(){
         for (ItemList e:items){
-            itemScore.put(e,calculateScore(e.getId(),e.getCreatedAt()));
+            int numberOfItem=getNumberOfItemsInShoppingList(e);
+            itemScore.put(e,calculateScore(e.getId(),e.getCreatedAt(),numberOfItem));
         }
     }
-    private int calculateScore(long itemNumber, String lastItemDate) {
+    private int calculateScore(long itemNumber, String lastItemDate,int countOfItem) {
         DateFormat formatter ;
         Date date,date2;
         Date c = Calendar.getInstance().getTime();
@@ -47,14 +48,31 @@ public class RecommendationService {
             date2 = (Date)formatter.parse(formattedDate);
 
             int score1=getDaysDifference(date,date2);
-            int score2=0;
-            int score3=0;
-            sumOfScores=score1+score2+score3;
+            int score2=countOfItem;
+            int score3=closestMarketScore(db.getItemList(itemNumber));
+            sumOfScores=score1*2+score2*3+score3;
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         return sumOfScores;
+    }
+    private int closestMarketScore(ItemList e){
+        long a=e.getShoppingListId();
+        ShoppingList temp=db.getShoppingList(a);
+        //long id=temp.getMarketID();
+        //Market p=db.getMarket(id);
+        //long distance=MyLocation-p;
+        return 0;
+    }
+    private int getNumberOfItemsInShoppingList(ItemList e){
+        int count=0;
+        for (ItemList b:items){
+            if (b.getTitle().equals(e.getTitle())){
+                count++;
+            }
+        }
+        return count;
     }
     public static int getDaysDifference(Date fromDate,Date toDate)
     {
@@ -65,14 +83,21 @@ public class RecommendationService {
     }
     public List<ItemList> getRecommendedList(){
         List<ItemList> newList=new ArrayList<>();
+        List<String> nameList=new ArrayList<>();
         Iterator it = itemScore.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             if ((Integer)pair.getValue()>threshold){
-                newList.add((ItemList) pair.getKey());
+                ItemList p=(ItemList)pair.getKey();
+                if (!nameList.contains(p.getTitle())){
+                    newList.add( p);
+                    nameList.add(p.getTitle());
+                }
             }
         }
         return newList;
     }
-
+    public void createReminderFromRecom(){
+        //createReminder(getRecommendedList());
+    }
 }
