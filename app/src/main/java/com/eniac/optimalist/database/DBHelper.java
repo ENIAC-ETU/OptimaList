@@ -124,10 +124,12 @@ public class DBHelper extends SQLiteOpenHelper {
         return count;
     }
 
-    public long insertReminder(String title) {
+    public long insertReminder(String title, long shopping_list_id, long market_id) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(ReminderModel.COLUMN_TITLE, title);
+        contentValues.put(ReminderModel.COLUMN_SHOPPING_LIST_ID,shopping_list_id);
+        contentValues.put(ReminderModel.COLUMN_MARKET_ID,market_id);
         return db.insert(ReminderModel.TABLE_NAME, null, contentValues);
     }
 
@@ -140,7 +142,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 reminder = new ReminderModel(
                         cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_ID)),
                         cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_TITLE)),
-                        cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_CREATED_AT))
+                        cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_CREATED_AT)),
+                        cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_SHOPPING_LIST_ID)),
+                        cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_MARKET_ID))
                 );
             }
         }
@@ -153,6 +157,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(reminder.COLUMN_TITLE, reminder.getTitle());
+        values.put(reminder.COLUMN_SHOPPING_LIST_ID,reminder.get_shopping_list_id());
+        values.put(reminder.COLUMN_MARKET_ID,reminder.get_market_id());
 
         // updating row
         return db.update(ReminderModel.TABLE_NAME, values, ReminderModel.COLUMN_ID + " = " + reminder.getId(), null);
@@ -171,9 +177,12 @@ public class DBHelper extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 do {
                     reminders.add(new ReminderModel(
-                                    cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_ID)),
-                                    cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_TITLE)),
-                                    cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_CREATED_AT))
+                            cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_ID)),
+                            cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_TITLE)),
+                            cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_CREATED_AT)),
+                            cursor.getLong(cursor.getColumnIndex(ReminderModel.COLUMN_SHOPPING_LIST_ID)),
+                            cursor.getLong(cursor.getColumnIndex(ReminderModel.COLUMN_MARKET_ID))
+
                             )
                     );
                 } while (cursor.moveToNext());
@@ -191,7 +200,6 @@ public class DBHelper extends SQLiteOpenHelper {
         int count = cursor.getCount();
         cursor.close();
 
-        // return count
         return count;
     }
 

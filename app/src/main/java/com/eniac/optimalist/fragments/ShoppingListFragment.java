@@ -16,16 +16,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.eniac.optimalist.MainActivity;
 import com.eniac.optimalist.R;
 import com.eniac.optimalist.activities.ItemActivity;
+import com.eniac.optimalist.adapters.ReminderAdapter;
 import com.eniac.optimalist.adapters.ShoppingListAdapter;
 import com.eniac.optimalist.database.DBHelper;
+import com.eniac.optimalist.database.model.Market;
 import com.eniac.optimalist.database.model.ReminderModel;
 import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.utils.DividerItemDecoration;
@@ -38,12 +42,14 @@ public class ShoppingListFragment extends Fragment {
 
     public static DBHelper db;
     private ShoppingListAdapter shoppingListAdapter;
+    private ReminderAdapter reminderAdapter;
     private List<ShoppingList> shoppingLists = new ArrayList<>();
+    private List<ReminderModel> reminders = new ArrayList<>();
+    private List<Market> markets = new ArrayList<>();
     private RecyclerView recyclerView;
     private TextView noShoppingListView;
     public static long currentPositionId;
     public static String currentShoppingListTitle;
-    private List<ReminderModel> reminderModelList = new ArrayList<>();
 CheckBox location_box;
     @Nullable
     @Override
@@ -87,7 +93,8 @@ CheckBox location_box;
             }
         });
 
-
+        reminders.addAll(db.getAllReminders());
+        markets.addAll(db.getAllMarkets());
         shoppingLists.addAll(db.getAllShoppingLists());
 
         shoppingListAdapter = new ShoppingListAdapter(getActivity(), shoppingLists);
@@ -97,6 +104,8 @@ CheckBox location_box;
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL, 16));
         recyclerView.setAdapter(shoppingListAdapter);
+        reminderAdapter = new ReminderAdapter(getActivity(), reminders);
+
 
         toggleEmptyShoppingLists();
 
@@ -203,7 +212,7 @@ CheckBox location_box;
                     showShoppingListDialog(true, shoppingLists.get(position), position);
                 }
                 else if (which == 1){
-                    createReminder("title");
+                    showReminderDialog(position);
                 }
                 else {
                     deleteShoppingList(position);
@@ -325,22 +334,65 @@ CheckBox location_box;
         });
     }
 
-    private void createReminder(String title) {
+    private void showReminderDialog(final int position) {
+        LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getActivity().getApplicationContext());
+        View view = layoutInflaterAndroid.inflate(R.layout.add_reminder_from_shopping_list, null);
+
+        final Spinner spinner2 = (Spinner) view.findViewById(R.id.rem_markets_spinner);
+        ArrayAdapter<Market> dataAdapter2 = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, markets);
+        dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner2.setAdapter(dataAdapter2);
+
+
+        AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(this.getActivity());
+        alertDialogBuilderUserInput.setView(view);
+
+        final EditText title = view.findViewById(R.id.reminder);
+
+        TextView dialogTitle = view.findViewById(R.id.rem_dialog_title);
+        dialogTitle.setText(getContext().getString(R.string.reminder));
+
+        alertDialogBuilderUserInput
+                .setCancelable(false)
+                .setPositiveButton("kaydet", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogBox, int id) {
+                        createReminder(title.getText().toString(),shoppingLists.get(position).getId(),((Market)spinner2.getSelectedItem()).getId());
+                    }
+                })
+                .setNegativeButton("iptal",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialogBox, int id) {
+                                dialogBox.cancel();
+                            }
+                        });
+
+        final AlertDialog alertDialog = alertDialogBuilderUserInput.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    createReminder(title.getText().toString(),shoppingLists.get(position).getId(),((Market)spinner2.getSelectedItem()).getId());
+                alertDialog.dismiss();
+
+            }
+        });
+    }
+
+    private void createReminder(String title, long shopping_list_id, long market_id) {
         // inserting reminder for shopping list in db and getting
         // newly inserted reminder id
-        long id = db.insertReminder(title);
+        long id = db.insertReminder(title, shopping_list_id, market_id);
 
         // get the newly inserted reminder from db
         ReminderModel r= db.getReminder(id);
 
         if (r != null) {
             // adding new reminder to array list at 0 position
-            reminderModelList.add(0, r);
+            reminders.add(0, r);
 
             // refreshing the list
-            //reminderAdapter.notifyDataSetChanged();
-
-            //toggleEmptyReminders();
+            reminderAdapter.notifyDataSetChanged();
         }
     }
 
