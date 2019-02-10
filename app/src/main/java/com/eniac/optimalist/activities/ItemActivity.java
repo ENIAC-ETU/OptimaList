@@ -2,6 +2,7 @@ package com.eniac.optimalist.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.eniac.optimalist.adapters.MarketAdapter;
@@ -68,6 +69,17 @@ public class ItemActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showSelectMarketDialog();
+            }
+        });
+
+
+        FloatingActionButton fab_image = (FloatingActionButton) findViewById(R.id.fab_image);
+        fab_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(ItemActivity.this, ImageActivity.class);
+                startActivity(intent);
             }
         });
 
