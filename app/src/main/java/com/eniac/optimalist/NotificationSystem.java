@@ -26,15 +26,19 @@ public class NotificationSystem {
     }
 
     public void setNotification(Context context, String notificationTitle, String notificationMessage, int notificationRequestCode) {
+        Intent intent = new Intent(context, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, notificationRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context,MainActivity.CHANNEL_1_ID)
                         .setSmallIcon(R.drawable.ic_launcher_background)
                         .setContentTitle(notificationTitle)
                         .setColor(101)
-                        .setContentText(notificationMessage);
+                        .setContentText(notificationMessage)
+                        .addAction( R.drawable.common_google_signin_btn_icon_dark,"Go To Shopping List", contentIntent)
+                        .addAction( R.drawable.common_google_signin_btn_icon_dark,"Delete Reminder", contentIntent)
+                ;
 
-        Intent intent = new Intent(context, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, notificationRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(contentIntent);
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(0, builder.build());

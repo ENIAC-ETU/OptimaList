@@ -28,6 +28,7 @@ import com.eniac.optimalist.fragments.MarketFragment;
 import com.eniac.optimalist.fragments.ReminderFragment;
 import com.eniac.optimalist.fragments.ShoppingListFragment;
 import com.eniac.optimalist.services.LocationService;
+import com.eniac.optimalist.services.RecommendationService;
 
 import android.Manifest;
 import android.content.Intent;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer;
     private boolean serviceStatus=true;
     public static Intent locationIntent;
+    private RecommendationService p1;
     boolean mBound = false;
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -104,6 +106,8 @@ public class MainActivity extends AppCompatActivity
         if (serviceStatus) {
             startService(locationIntent);
             Log.d("MyLocation:","hey");
+            p1=new RecommendationService(getApplicationContext());
+            p1.createReminderFromRecom();
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame, new ShoppingListFragment());

@@ -355,4 +355,20 @@ public class DBHelper extends SQLiteOpenHelper {
         // return count
         return count;
     }
+    public ReminderModel getMarketSpecificReminder(Market A){
+        SQLiteDatabase db = this.getReadableDatabase();
+        ReminderModel reminder = null;
+        try (Cursor cursor = db.query(ReminderModel.TABLE_NAME, null ,ReminderModel.COLUMN_MARKET_ID + " = " + A.getId(), null, null, null, null)) {
+            if (cursor.moveToFirst()) {
+                reminder = new ReminderModel(
+                        cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_CREATED_AT)),
+                        cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_SHOPPING_LIST_ID)),
+                        cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_MARKET_ID))
+                );
+            }
+        }
+            return reminder;
+    }
 }

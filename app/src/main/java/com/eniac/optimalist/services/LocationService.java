@@ -18,6 +18,7 @@ import android.util.Log;
 import com.eniac.optimalist.NotificationSystem;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.Market;
+import com.eniac.optimalist.database.model.ReminderModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,7 @@ public class LocationService extends Service
         return mLastLocation;
         return null;
     }
+
     public class LocalBinder extends Binder {
         public LocationService getService() {
             // Return this instance of LocalService so clients can call public methods
@@ -87,8 +89,9 @@ public class LocationService extends Service
             B.setLatitude(lastClosest.getLat());
             B.setLongitude(lastClosest.getLng());
             float distance=A.distanceTo(B);
-            if (distance <distanceLimit){
-                notify.setNotification(getApplicationContext(), "You are close to ...", "You are close to "+lastClosest.getTitle(), 1);
+            ReminderModel m=db.getMarketSpecificReminder(lastClosest);
+            if (distance <distanceLimit && m!=null){
+                notify.setNotification(getApplicationContext(), "Reminder:"+m.getTitle(),  "ShopList:"+db.getShoppingList(m.get_shopping_list_id()).getTitle(), 1);
                 changed=false;
                 return true;
             }

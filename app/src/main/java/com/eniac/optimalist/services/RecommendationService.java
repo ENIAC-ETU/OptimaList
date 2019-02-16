@@ -1,11 +1,17 @@
 package com.eniac.optimalist.services;
 
+import android.app.Service;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ItemList;
 import com.eniac.optimalist.database.model.ShoppingList;
+import com.eniac.optimalist.fragments.ReminderFragment;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -20,9 +26,15 @@ import java.util.Map;
 
 public class RecommendationService {
     private DBHelper db;
+    private ReminderFragment rf;
+    private ShoppingList sl;
+    private long reminderId;
+    public RecommendationService(){
 
+    }
     public RecommendationService(Context p){
         db = DBHelper.getInstance(p.getApplicationContext());
+        rf=new ReminderFragment();
         items=db.getAllItemLists();
         itemScore=new HashMap<ItemList, Integer>();
     }
@@ -98,6 +110,24 @@ public class RecommendationService {
         return newList;
     }
     public void createReminderFromRecom(){
-        //createReminder(getRecommendedList());
+        initializeShoppingListToMap();
+        List<ShoppingList> temp=db.getAllShoppingLists();
+        reminderId=-1;
+        for (ShoppingList e:temp){
+            if(e.getTitle().equals("Recommended")){
+                reminderId=e.getId();
+            }
+        }
+
+        Log.d("MyLocation:","ReminderID:"+reminderId+"");
+        if(reminderId!=-1)
+            db.deleteShoppingList(db.getShoppingList(reminderId));
+        reminderId=db.insertShoppingList("Recommended");
+        for (ItemList e:getRecommendedList()){
+            db.insertItemList(e.getTitle(),reminderId);
+        }
+
+
     }
+
 }
