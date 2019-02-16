@@ -116,7 +116,7 @@ public class ItemActivity extends AppCompatActivity {
 
     //-------------------------------------------------------------------------------------------------------------
     private void showActionsDialog(final int position) {
-        CharSequence colors[] = new CharSequence[]{"Hatırlatıcı ekle", "Ürünü Sil", "Tüm alışveriş listelerinden ürünü sil"};
+        CharSequence colors[] = new CharSequence[]{"Hatırlatıcı ekle", "Ürünü Sil", "Tüm alışveriş listelerinden ürünü sil", "test"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
         builder.setTitle("Bir seçenek seçiniz");
@@ -129,9 +129,10 @@ public class ItemActivity extends AppCompatActivity {
                 else if (which == 1) {
                     deleteItem(position);
                 }
-                else{
+                else if (which == 2 ){
                     deleteItemFromAllShoppingLists(position);
-                }
+                }else
+                    createShoppingListFromOCR("asd",null);
 
             }
         });
@@ -284,6 +285,33 @@ public class ItemActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public ShoppingList createShoppingListFromOCR(String name, String[] OCR){// position of this method will be changed after ocr implementation
+        //creates a new shopping list
+        //parameters can be changed in future
+
+        String[] items={"misir", "sut", "un", "elma", "peynir"};
+        Double[] prices={9.90,4.75,15.50,7.89,4.85};
+
+        // inserting shopping list in db and getting
+        // newly inserted shopping list id
+        long id = db.insertShoppingList(name);
+
+        // get the newly inserted shopping list from db
+        ShoppingList l = db.getShoppingList(id);
+
+        for(int i=0;i<items.length;i++) {
+            long itemId =db.insertItemList(items[i], ShoppingListFragment.currentPositionId);
+            ItemList item =db.getItemList(itemId);
+            itemLists.add(0, item);
+
+            itemListAdapter.notifyDataSetChanged();
+
+            toggleEmptyItemLists();
+        }
+
+        return l;
     }
 
 }
