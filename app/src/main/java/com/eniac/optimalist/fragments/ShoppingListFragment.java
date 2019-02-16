@@ -135,6 +135,7 @@ CheckBox location_box;
     public void showItems(){
 
         Intent intent = new Intent(getContext(), ItemActivity.class);
+        intent.putExtra("id",currentPositionId);
         startActivity(intent);
     }
 

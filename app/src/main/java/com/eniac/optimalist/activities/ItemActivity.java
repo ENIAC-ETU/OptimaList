@@ -13,6 +13,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -40,7 +41,7 @@ public class ItemActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TextView noItemListView;
     private List<Market> markets = new ArrayList<>();
-
+    private long shop_id=-1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +54,7 @@ public class ItemActivity extends AppCompatActivity {
         markets.addAll(db.getAllMarkets());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
-        toolbar.setTitle(ShoppingListFragment.currentShoppingListTitle);
-        setSupportActionBar(toolbar);
+
 
         FloatingActionButton fab_add_item = (FloatingActionButton) findViewById(R.id.fab_add_item);
         fab_add_item.setOnClickListener(new View.OnClickListener() {
@@ -84,9 +84,19 @@ public class ItemActivity extends AppCompatActivity {
         });
 
         //itemLists.addAll(db.getAllItemLists());
-        itemLists.addAll(db.getCurrentItems(ShoppingListFragment.currentPositionId));
+        Intent intent = getIntent();
+        long value=intent.getLongExtra("id",0);
+        Bundle b = intent.getExtras();
+        long j=0;
+        if (b!=null) {
+            j = (Long) b.get("id");
+            shop_id=j;
+            Log.d("MyLocation:a","id:"+j);
+            itemLists.addAll(db.getCurrentItems(j));
+        }
         itemListAdapter = new ItemListAdapter(this, itemLists);
-
+        toolbar.setTitle(db.getShoppingList(j).getTitle());
+        setSupportActionBar(toolbar);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -225,7 +235,7 @@ public class ItemActivity extends AppCompatActivity {
     private void addItemToShoppingList(String item){
 
 
-        long id = db.insertItemList(item, ShoppingListFragment.currentPositionId);
+        long id = db.insertItemList(item, shop_id);
 
         ItemList l = db.getItemList(id);
 
