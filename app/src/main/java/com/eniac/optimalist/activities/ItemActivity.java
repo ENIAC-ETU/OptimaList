@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -95,7 +96,7 @@ public class ItemActivity extends AppCompatActivity {
             itemLists.addAll(db.getCurrentItems(j));
         }
         itemListAdapter = new ItemListAdapter(this, itemLists);
-        toolbar.setTitle(db.getShoppingList(j).getTitle());
+        toolbar.setTitle("Alışveriş Listesi: "+db.getShoppingList(j).getTitle());
         setSupportActionBar(toolbar);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -126,7 +127,7 @@ public class ItemActivity extends AppCompatActivity {
 
     //-------------------------------------------------------------------------------------------------------------
     private void showActionsDialog(final int position) {
-        CharSequence colors[] = new CharSequence[]{"Hatırlatıcı ekle", "Ürünü Sil", "Tüm alışveriş listelerinden ürünü sil", "test"};
+        CharSequence colors[] = new CharSequence[]{"Ürünü Sil", "Tüm alışveriş listelerinden ürünü sil", "test"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ItemActivity.this);
         builder.setTitle("Bir seçenek seçiniz");
@@ -134,12 +135,9 @@ public class ItemActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
-
-                }
-                else if (which == 1) {
                     deleteItem(position);
                 }
-                else if (which == 2 ){
+                else if (which == 1 ){
                     deleteItemFromAllShoppingLists(position);
                 }else
                     createShoppingListFromOCR("asd",null);
@@ -198,6 +196,11 @@ public class ItemActivity extends AppCompatActivity {
         alertDialogBuilderUserInput.setView(view);
 
         final EditText inputItemName = view.findViewById(R.id.add_item);
+        final NumberPicker inputAmount = view.findViewById(R.id.amount_picker);
+        inputAmount.setMaxValue(15);
+        inputAmount.setMinValue(0);
+        final EditText inputPrice = view.findViewById(R.id.price_input);
+
 
         TextView dialogTitle = view.findViewById(R.id.add_item_dialog_title);
         dialogTitle.setText(getString(R.string.new_item));
@@ -226,16 +229,16 @@ public class ItemActivity extends AppCompatActivity {
             public void onClick(View v) {
                 alertDialog.dismiss();
 
-                addItemToShoppingList(inputItemName.getText().toString());
+                addItemToShoppingList(inputItemName.getText().toString(),inputAmount.getValue(),Float.parseFloat(inputPrice.getText().toString()));
             }
         });
     }
 
 
-    private void addItemToShoppingList(String item){
+    private void addItemToShoppingList(String item,int amount,float price){
 
 
-        long id = db.insertItemList(item, shop_id);
+        long id = db.insertItemList(item, amount, price, shop_id);
 
         ItemList l = db.getItemList(id);
 
@@ -302,7 +305,7 @@ public class ItemActivity extends AppCompatActivity {
         //parameters can be changed in future
 
         String[] items={"misir", "sut", "un", "elma", "peynir"};
-        Double[] prices={9.90,4.75,15.50,7.89,4.85};
+        Float[] prices={9.90f,4.75f,15.50f,7.89f,4.85f};
 
         // inserting shopping list in db and getting
         // newly inserted shopping list id
@@ -312,7 +315,7 @@ public class ItemActivity extends AppCompatActivity {
         ShoppingList l = db.getShoppingList(id);
 
         for(int i=0;i<items.length;i++) {
-            long itemId =db.insertItemList(items[i], ShoppingListFragment.currentPositionId);
+            long itemId =db.insertItemList(items[i],1 , prices[i], ShoppingListFragment.currentPositionId);
             ItemList item =db.getItemList(itemId);
             itemLists.add(0, item);
 

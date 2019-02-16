@@ -37,4 +37,5 @@
         android:textColor="@color/shopping_list_text"
         android:textSize="@dimen/shopping_list_text" />
 
+
 </RelativeLayout>

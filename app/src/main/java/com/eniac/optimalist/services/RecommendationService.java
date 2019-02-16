@@ -124,7 +124,7 @@ public class RecommendationService {
             db.deleteShoppingList(db.getShoppingList(reminderId));
         reminderId=db.insertShoppingList("Recommended");
         for (ItemList e:getRecommendedList()){
-            db.insertItemList(e.getTitle(),reminderId);
+            db.insertItemList(e.getTitle(),1,1.8f,reminderId);
         }
 
 

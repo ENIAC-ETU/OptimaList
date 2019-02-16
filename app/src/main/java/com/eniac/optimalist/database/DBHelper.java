@@ -270,11 +270,13 @@ public class DBHelper extends SQLiteOpenHelper {
         return db.delete(Market.TABLE_NAME, Market.COLUMN_ID + " = " + market.getId(), null) > 0;
     }
 
-    public long insertItemList(String title, long currentPositionId) {
+    public long insertItemList(String title,int amount,float price, long currentPositionId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(ItemList.COLUMN_TITLE, title);
         contentValues.put(ItemList.COLUMN_SHOPPING_LIST_ID,currentPositionId);
+        contentValues.put(ItemList.COLUMN_AMOUNT,amount);
+        contentValues.put(ItemList.COLUMN_PRICE,price);
         return db.insert(ItemList.TABLE_NAME, null, contentValues);
     }
 
@@ -287,6 +289,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 itemList = new ItemList(
                         cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_ID)),
                         cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)),
+                        cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_AMOUNT)),
+                        cursor.getFloat(cursor.getColumnIndex(ItemList.COLUMN_PRICE)),
                         cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CREATED_AT)),
                         cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_SHOPPING_LIST_ID))
 
@@ -311,6 +315,8 @@ public class DBHelper extends SQLiteOpenHelper {
                     itemLists.add(new ItemList(
                                     cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_ID)),
                                     cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)),
+                                    cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_AMOUNT)),
+                                    cursor.getFloat(cursor.getColumnIndex(ItemList.COLUMN_PRICE)),
                                     cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CREATED_AT)),
                                     cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_SHOPPING_LIST_ID))
                             )
@@ -333,6 +339,8 @@ public class DBHelper extends SQLiteOpenHelper {
                     itemLists.add(new ItemList(
                                     cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_ID)),
                                     cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)),
+                                    cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_AMOUNT)),
+                                    cursor.getFloat(cursor.getColumnIndex(ItemList.COLUMN_PRICE)),
                                     cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CREATED_AT)),
                                     cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_SHOPPING_LIST_ID))
                             )
