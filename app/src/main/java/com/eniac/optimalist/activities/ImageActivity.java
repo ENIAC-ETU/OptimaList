@@ -16,8 +16,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.eniac.optimalist.R;
+import com.eniac.optimalist.adapters.OCRAdapter;
+import com.eniac.optimalist.utils.OCRParsedItem;
 import com.eniac.optimalist.utils.OCRRawItem;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.HttpTransport;
@@ -39,6 +42,8 @@ import com.google.api.services.vision.v1.model.Word;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class ImageActivity extends AppCompatActivity {
     Button btn_gallery;
@@ -49,6 +54,9 @@ public class ImageActivity extends AppCompatActivity {
     private static final String TAG = "ImageActivity";
     private static ProgressDialog progressDialog;
     private static final int MAX_DIMENSION = 1200;
+    private ListView lv;
+    private OCRAdapter ocrAdapter;
+    private String date = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +82,6 @@ public class ImageActivity extends AppCompatActivity {
 
             }
         });
-
-
     }
     @Override
 
@@ -223,8 +229,8 @@ public class ImageActivity extends AppCompatActivity {
                 }
             }
 
-            List<String> parsedLines = new ArrayList<>();
             int threshold = 10;
+            List<OCRParsedItem> parsedItems = new ArrayList<>();
             for (int i = 0; i < ocrRawItems.size(); i++) {
                 OCRRawItem item = ocrRawItems.get(i);
                 StringBuilder line = new StringBuilder(item.getText());
@@ -244,15 +250,47 @@ public class ImageActivity extends AppCompatActivity {
                 }
 
                 if (!item.isUsed()) {
-                    parsedLines.add(line.toString());
+                    String s = line.toString().toLowerCase();
+                    if (s.contains("tarih") | s.contains("tarıh")) {
+                        Pattern p = Pattern.compile("\\d\\d\\.\\d\\d\\.\\d\\d\\d?\\d?");
+                        Matcher m = p.matcher(s);
+                        if (m.find()) {
+                            date = s.substring(m.start(), m.end());
+                            Log.d("PatternMatch", "Date: " + date);
+                        }
+                    }
+                    else if (s.contains("topkdv") || s.contains("toplam")) {
+                        break;
+                    }
+                    else if (s.contains("*")) {
+                        String[] splitLine = s.split("\\*");
+                        Pattern p = Pattern.compile("([^\\s]%)|([^\\s](01|08|18))");
+                        Matcher m = p.matcher(splitLine[0]);
+                        if (m.find()) {
+                            String productName = line.toString().substring(0, m.start()).trim();
+                            String price = splitLine[1].replace(',', '.').replaceAll("[^\\d.]", "");
+                            Log.d("PatternMatch", "Name: " + productName + ", Price: " + price);
+                            parsedItems.add(new OCRParsedItem(productName, price));
+                        }
+                    }
                 }
             }
 
-            String result = TextUtils.join("\n", parsedLines);
-            Log.d(TAG, result);
+            String parsedResult = TextUtils.join("\n", parsedItems);
+            Log.d(TAG, parsedResult);
             setContentView(R.layout.ocr_result);
-            EditText ocrResult = (EditText) findViewById(R.id.ocrResult);
-            ocrResult.setText(result);
+            lv = (ListView) findViewById(R.id.listView);
+            ocrAdapter = new OCRAdapter(context, parsedItems);
+            lv.setAdapter(ocrAdapter);
+            final EditText dateText = (EditText) findViewById(R.id.ocrDate);
+            dateText.setText(date);
+            Button acceptOCR = (Button) findViewById(R.id.acceptOCR);
+            acceptOCR.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("PatternMatch", "Date: " + dateText.getText() + ", Parsed items: " + OCRAdapter.ocrParsedItemList.toString());
+                }
+            });
             progressDialog.dismiss();
         }
     }
