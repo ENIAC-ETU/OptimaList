@@ -48,6 +48,7 @@ public class ImageActivity extends AppCompatActivity {
     ImageView img;
     private static final String TAG = "ImageActivity";
     private static ProgressDialog progressDialog;
+    private static final int MAX_DIMENSION = 1200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +94,7 @@ public class ImageActivity extends AppCompatActivity {
                     progressDialog.setMessage("Görüntü işleniyor. Bu işlem yaklaşık 1 dakika sürecektir. Lütfen bekleyiniz...");
                     progressDialog.show();
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
-                    new CloudVisionTask(getBaseContext(), bitmap).execute();
+                    new CloudVisionTask(getBaseContext(), scaleBitmapDown(bitmap, MAX_DIMENSION)).execute();
                 } catch (Exception e) {
                     progressDialog.dismiss();
                     e.printStackTrace();
@@ -254,5 +255,25 @@ public class ImageActivity extends AppCompatActivity {
             ocrResult.setText(result);
             progressDialog.dismiss();
         }
+    }
+
+    private Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
+
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+        int resizedWidth = maxDimension;
+        int resizedHeight = maxDimension;
+
+        if (originalHeight > originalWidth) {
+            resizedHeight = maxDimension;
+            resizedWidth = (int) (resizedHeight * (float) originalWidth / (float) originalHeight);
+        } else if (originalWidth > originalHeight) {
+            resizedWidth = maxDimension;
+            resizedHeight = (int) (resizedWidth * (float) originalHeight / (float) originalWidth);
+        } else if (originalHeight == originalWidth) {
+            resizedHeight = maxDimension;
+            resizedWidth = maxDimension;
+        }
+        return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
 }
