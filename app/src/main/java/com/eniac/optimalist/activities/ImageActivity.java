@@ -264,7 +264,7 @@ public class ImageActivity extends AppCompatActivity {
                     }
                     else if (s.contains("*")) {
                         String[] splitLine = s.split("\\*");
-                        Pattern p = Pattern.compile("([^\\s]%)|([^\\s](01|08|18))");
+                        Pattern p = Pattern.compile("(%)|([^\\s]*[0o1][18])");
                         Matcher m = p.matcher(splitLine[0]);
                         if (m.find()) {
                             String productName = line.toString().substring(0, m.start()).trim();
