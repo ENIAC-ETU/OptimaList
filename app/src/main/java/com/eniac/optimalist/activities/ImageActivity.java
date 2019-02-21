@@ -7,7 +7,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,11 +19,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.Manifest;
 
 import com.eniac.optimalist.R;
 import com.eniac.optimalist.adapters.OCRAdapter;
 import com.eniac.optimalist.utils.OCRParsedItem;
 import com.eniac.optimalist.utils.OCRRawItem;
+import com.eniac.optimalist.utils.PermissionUtils;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -40,6 +44,7 @@ import com.google.api.services.vision.v1.model.TextAnnotation;
 import com.google.api.services.vision.v1.model.Word;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -57,6 +62,9 @@ public class ImageActivity extends AppCompatActivity {
     private ListView lv;
     private OCRAdapter ocrAdapter;
     private String date = "";
+    public static final int CAMERA_PERMISSIONS_REQUEST = 2;
+    public static final int CAMERA_IMAGE_REQUEST = 3;
+    public static final String FILE_NAME = "temp.jpg";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,10 +87,33 @@ public class ImageActivity extends AppCompatActivity {
         btn_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+              startCamera();
             }
         });
     }
+
+
+    public void startCamera() {
+        if (PermissionUtils.requestPermission(
+                this,
+                CAMERA_PERMISSIONS_REQUEST,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA)) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Uri photoUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile());
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
+        }
+    }
+
+    public File getCameraFile() {
+        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        return new File(dir, FILE_NAME);
+    }
+
+
+
     @Override
 
     public void onActivityResult(int requestCode,int resultCode,Intent data)
