@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
@@ -43,11 +44,18 @@ public class ItemActivity extends AppCompatActivity {
     private TextView noItemListView;
     private List<Market> markets = new ArrayList<>();
     private long shop_id=-1;
+
+    public AutoCompleteTextView text;
+
+    private static final String[] items = new String[] {
+            "Kahve","Yumurta","Süt","Domates", "Peynir"
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_item2);
+
+
         db = DBHelper.getInstance(this);
         recyclerView = findViewById(R.id.recycler_view);
         noItemListView = findViewById(R.id.empty_item_lists_view);
@@ -192,13 +200,26 @@ public class ItemActivity extends AppCompatActivity {
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
         View view = layoutInflaterAndroid.inflate(R.layout.add_item_dialog, null);
 
+
         AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(ItemActivity.this);
         alertDialogBuilderUserInput.setView(view);
 
-        final EditText inputItemName = view.findViewById(R.id.add_item);
+
+        text=(AutoCompleteTextView) view.findViewById(R.id.add_item);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (this,android.R.layout.simple_list_item_1,items);
+        text.setAdapter(adapter);
+        text.setThreshold(1);
+
+
+
+
+        final EditText inputItemName = text;
+
         final NumberPicker inputAmount = view.findViewById(R.id.amount_picker);
         inputAmount.setMaxValue(15);
-        inputAmount.setMinValue(0);
+        inputAmount.setMinValue(1);
         final EditText inputPrice = view.findViewById(R.id.price_input);
 
 
