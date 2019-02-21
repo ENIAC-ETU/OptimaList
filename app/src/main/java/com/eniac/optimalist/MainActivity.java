@@ -26,6 +26,7 @@ import android.support.v4.app.NotificationCompat;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.fragments.MarketFragment;
 import com.eniac.optimalist.fragments.ReminderFragment;
+import com.eniac.optimalist.fragments.SettingFragment;
 import com.eniac.optimalist.fragments.ShoppingListFragment;
 import com.eniac.optimalist.services.LocationService;
 import com.eniac.optimalist.services.RecommendationService;
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_reminders) {
             ft.replace(R.id.content_frame, new ReminderFragment());
         } else if (id == R.id.nav_manage) {
-
+            ft.replace(R.id.content_frame, new SettingFragment());
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
