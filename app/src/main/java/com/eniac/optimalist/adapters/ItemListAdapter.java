@@ -52,7 +52,11 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyView
     public void onBindViewHolder(MyViewHolder holder, int position) {
         ItemList itemList = itemLists.get(position);
 
-        holder.itemList.setText(itemList.getAmount()+" Adet "+itemList.getTitle()+" Fiyat: "+itemList.getPrice());
+        if(itemList.getPrice()>0) {
+            holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle() + " Fiyat: " + itemList.getPrice());
+        }else{
+            holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle());
+        }
 
         // Displaying dot from HTML character code
         holder.dot.setText(Html.fromHtml("&#8226;"));

@@ -250,7 +250,13 @@ public class ItemActivity extends AppCompatActivity {
             public void onClick(View v) {
                 alertDialog.dismiss();
 
-                addItemToShoppingList(inputItemName.getText().toString(),inputAmount.getValue(),Float.parseFloat(inputPrice.getText().toString()));
+                if(inputPrice.getText().toString().trim().isEmpty()){
+                    inputPrice.setText("0");
+                }
+                 addItemToShoppingList(inputItemName.getText().toString(), inputAmount.getValue(), Float.parseFloat(inputPrice.getText().toString()));
+
+
+
             }
         });
     }
