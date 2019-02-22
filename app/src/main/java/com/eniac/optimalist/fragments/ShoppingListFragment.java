@@ -5,7 +5,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
+
+//import android.support.design.widget.FloatingActionButton;
+import com.eniac.optimalist.activities.ImageActivity;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -90,6 +93,16 @@ CheckBox location_box;
             @Override
             public void onClick(View view) {
                 showShoppingListDialog(false, null, -1);
+            }
+        });
+
+
+        FloatingActionButton select_image = (FloatingActionButton) view.findViewById(R.id.select_image);
+        select_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ImageActivity.class);
+                startActivity(intent);
             }
         });
 

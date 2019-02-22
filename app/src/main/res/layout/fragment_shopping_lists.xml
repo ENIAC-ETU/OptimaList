@@ -24,18 +24,41 @@
         android:textColor="@color/msg_no_shopping_list"
         android:textSize="@dimen/msg_no_shopping_lists" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        srcCompat="@android:drawable/ic_input_add"
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/multiple_actions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_marginEnd="212dp"
         android:layout_marginBottom="16dp"
-        android:src="@android:drawable/ic_input_add"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        fab:fab_addButtonColorNormal="@color/white"
+        fab:fab_addButtonColorPressed="@color/white_pressed"
+        fab:fab_addButtonPlusIconColor="@color/half_black"
+        fab:fab_labelStyle="@style/menu_labels_style">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/googleg_standard_color_18"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_colorPressed="@color/white_pressed"
+            fab:fab_title="Alışveriş Listesi Ekle" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/select_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/googleg_standard_color_18"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_colorPressed="@color/white_pressed"
+            fab:fab_title="Resim Seç" />
+
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
     <CheckBox
         android:id="@+id/checkbox"
