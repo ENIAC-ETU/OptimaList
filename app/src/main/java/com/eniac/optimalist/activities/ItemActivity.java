@@ -82,15 +82,7 @@ public class ItemActivity extends AppCompatActivity {
         });
 
 
-        FloatingActionButton fab_image = (FloatingActionButton) findViewById(R.id.fab_image);
-        fab_image.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-                Intent intent = new Intent(ItemActivity.this, ImageActivity.class);
-                startActivity(intent);
-            }
-        });
 
         //itemLists.addAll(db.getAllItemLists());
         Intent intent = getIntent();

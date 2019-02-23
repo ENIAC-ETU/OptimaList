@@ -62,14 +62,6 @@
             fab:fab_title="Market Seç" />
 
 
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/googleg_standard_color_18"
-            fab:fab_colorNormal="@color/white"
-            fab:fab_colorPressed="@color/white_pressed"
-            fab:fab_title="Resim Seç" />
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 </android.support.design.widget.CoordinatorLayout>
