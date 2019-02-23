@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -87,11 +88,10 @@ public class ImageActivity extends AppCompatActivity {
         btn_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              startCamera();
+                startCamera();
             }
         });
     }
-
 
     public void startCamera() {
         if (PermissionUtils.requestPermission(
@@ -112,18 +112,20 @@ public class ImageActivity extends AppCompatActivity {
         return new File(dir, FILE_NAME);
     }
 
-
-
     @Override
+    public void onActivityResult(int requestCode,int resultCode,Intent data) {
+        if(resultCode == RESULT_OK) {
+            Uri selectedImageUri = null;
+            if(requestCode == SELECT_PICTURE) {
+                selectedImageUri = data.getData();
+                //selectedImagePath = getPath(selectedImageUri);
+            }
+            else if (requestCode == CAMERA_IMAGE_REQUEST) {
+                selectedImageUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", getCameraFile());
+            }
 
-    public void onActivityResult(int requestCode,int resultCode,Intent data)
-    {
-        if(resultCode==RESULT_OK)
-        {
-            if(requestCode==SELECT_PICTURE)
-            {
-                Uri selectedImageUri = data.getData();
-                selectedImagePath = getPath(selectedImageUri);
+            if (selectedImageUri != null) {
+                Log.d(TAG, selectedImageUri.toString());
                 img.setImageURI(selectedImageUri);
 
                 try {
@@ -137,6 +139,19 @@ public class ImageActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case CAMERA_PERMISSIONS_REQUEST:
+                if (PermissionUtils.permissionGranted(requestCode, CAMERA_PERMISSIONS_REQUEST, grantResults)) {
+                    startCamera();
+                }
+                break;
         }
     }
 
