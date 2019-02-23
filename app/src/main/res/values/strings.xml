@@ -21,4 +21,6 @@
 
     <string name="reminder">Hatırlatıcı Başlığı</string>
 
+    <string name="rename_item">Bu ürün alışveriş listesinde mevcut</string>
+
 </resources>

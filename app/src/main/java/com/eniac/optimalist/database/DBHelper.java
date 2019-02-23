@@ -352,6 +352,25 @@ public class DBHelper extends SQLiteOpenHelper {
         return itemLists;
     }
 
+    public boolean isInclude(long shoppingListId, String itemName){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        try (Cursor cursor = db.query(ItemList.TABLE_NAME, null, ItemList.COLUMN_SHOPPING_LIST_ID + " = " + shoppingListId, null, null, null, ItemList.COLUMN_CREATED_AT + " desc")){
+            if (cursor.moveToFirst()) {
+                do {
+                    if (itemName.equalsIgnoreCase(cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE))))
+                    {
+                        return true;
+                    }
+
+
+                } while (cursor.moveToNext());
+            }
+
+        }
+        return false;
+    }
+
     public int getItemListsCount() {
         String countQuery = "select * from " + ItemList.TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();

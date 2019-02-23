@@ -125,7 +125,7 @@ public class ItemActivity extends AppCompatActivity {
 
     }
 
-    //-------------------------------------------------------------------------------------------------------------
+
     private void showActionsDialog(final int position) {
         CharSequence colors[] = new CharSequence[]{"Ürünü Sil", "Tüm alışveriş listelerinden ürünü sil", "test"};
 
@@ -187,42 +187,19 @@ public class ItemActivity extends AppCompatActivity {
         toggleEmptyItemLists();
     }
 
+    private void showRenameItem(){
 
-    private void showAddItemDialog() {
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
-        View view = layoutInflaterAndroid.inflate(R.layout.add_item_dialog, null);
+        View view = layoutInflaterAndroid.inflate(R.layout.rename_item, null);
 
 
         AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(ItemActivity.this);
         alertDialogBuilderUserInput.setView(view);
 
 
-        text=(AutoCompleteTextView) view.findViewById(R.id.add_item);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this,android.R.layout.simple_list_item_1,items);
-        text.setAdapter(adapter);
-        text.setThreshold(1);
-
-
-
-
-        final EditText inputItemName = text;
-
-        final NumberPicker inputAmount = view.findViewById(R.id.amount_picker);
-        inputAmount.setMaxValue(15);
-        inputAmount.setMinValue(1);
-        final EditText inputPrice = view.findViewById(R.id.price_input);
-
-
-        TextView dialogTitle = view.findViewById(R.id.add_item_dialog_title);
-        dialogTitle.setText(getString(R.string.new_item));
-
-
-
         alertDialogBuilderUserInput
                 .setCancelable(false)
-                .setPositiveButton("kaydet", new DialogInterface.OnClickListener() {
+                .setPositiveButton("yeniden adlandır", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogBox, int id) {
 
                     }
@@ -240,18 +217,90 @@ public class ItemActivity extends AppCompatActivity {
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 alertDialog.dismiss();
 
-                if(inputPrice.getText().toString().trim().isEmpty()){
-                    inputPrice.setText("0");
-                }
-                 addItemToShoppingList(inputItemName.getText().toString(), inputAmount.getValue(), Float.parseFloat(inputPrice.getText().toString()));
-
-
-
+               showAddItemDialog();
             }
         });
+
+
+
     }
+
+    private void showAddItemDialog() {
+        LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
+        View view = layoutInflaterAndroid.inflate(R.layout.add_item_dialog, null);
+
+
+        AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(ItemActivity.this);
+        alertDialogBuilderUserInput.setView(view);
+
+
+        text=(AutoCompleteTextView) view.findViewById(R.id.add_item);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_list_item_1, items);
+        text.setAdapter(adapter);
+        text.setThreshold(1);
+
+
+
+
+
+            final EditText inputItemName = text;
+
+            final NumberPicker inputAmount = view.findViewById(R.id.amount_picker);
+            inputAmount.setMaxValue(15);
+            inputAmount.setMinValue(1);
+            final EditText inputPrice = view.findViewById(R.id.price_input);
+
+
+            TextView dialogTitle = view.findViewById(R.id.add_item_dialog_title);
+            dialogTitle.setText(getString(R.string.new_item));
+
+
+            alertDialogBuilderUserInput
+                    .setCancelable(false)
+                    .setPositiveButton("kaydet", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialogBox, int id) {
+
+                        }
+                    })
+                    .setNegativeButton("iptal",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialogBox, int id) {
+                                    dialogBox.cancel();
+                                }
+                            });
+
+            final AlertDialog alertDialog = alertDialogBuilderUserInput.create();
+            alertDialog.show();
+
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                    alertDialog.dismiss();
+
+                    if (inputPrice.getText().toString().trim().isEmpty()) {
+                        inputPrice.setText("0");
+                    }
+
+
+
+                    if(!(db.isInclude(shop_id,text.getText().toString()))) {
+                        addItemToShoppingList(inputItemName.getText().toString(), inputAmount.getValue(), Float.parseFloat(inputPrice.getText().toString()));
+
+                    }else{
+                        showRenameItem();
+                    }
+
+                }
+            });
+
+        }
 
 
     private void addItemToShoppingList(String item,int amount,float price){
