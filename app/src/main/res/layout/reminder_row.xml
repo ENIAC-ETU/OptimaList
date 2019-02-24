@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/timestamp"
-        android:layout_width="match_parent"
+        android:layout_width="169dp"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/dot"
         android:textColor="@color/timestamp"
@@ -36,5 +36,14 @@
         android:layout_toRightOf="@id/dot"
         android:textColor="@color/shopping_list_text"
         android:textSize="@dimen/shopping_list_text" />
+
+    <TextView
+        android:id="@+id/reminderTimeStamp"
+        android:layout_width="173dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/timestamp"
+        android:textColor="@color/timestamp"
+        android:textSize="@dimen/timestamp" />
 
 </RelativeLayout>

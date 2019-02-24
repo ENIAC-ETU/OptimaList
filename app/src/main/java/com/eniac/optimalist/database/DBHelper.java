@@ -124,12 +124,13 @@ public class DBHelper extends SQLiteOpenHelper {
         return count;
     }
 
-    public long insertReminder(String title, long shopping_list_id, long market_id) {
+    public long insertReminder(String title, long shopping_list_id, long market_id, String reminderTime) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(ReminderModel.COLUMN_TITLE, title);
         contentValues.put(ReminderModel.COLUMN_SHOPPING_LIST_ID,shopping_list_id);
         contentValues.put(ReminderModel.COLUMN_MARKET_ID,market_id);
+        contentValues.put(ReminderModel.COLUMN_REMINDER_TIME,reminderTime);
         return db.insert(ReminderModel.TABLE_NAME, null, contentValues);
     }
 
@@ -144,7 +145,8 @@ public class DBHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_TITLE)),
                         cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_CREATED_AT)),
                         cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_SHOPPING_LIST_ID)),
-                        cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_MARKET_ID))
+                        cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_MARKET_ID)),
+                        cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_REMINDER_TIME))
                 );
             }
         }
@@ -159,6 +161,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(reminder.COLUMN_TITLE, reminder.getTitle());
         values.put(reminder.COLUMN_SHOPPING_LIST_ID,reminder.get_shopping_list_id());
         values.put(reminder.COLUMN_MARKET_ID,reminder.get_market_id());
+        values.put(reminder.COLUMN_REMINDER_TIME,reminder.getReminder_time());
 
         // updating row
         return db.update(ReminderModel.TABLE_NAME, values, ReminderModel.COLUMN_ID + " = " + reminder.getId(), null);
@@ -181,7 +184,8 @@ public class DBHelper extends SQLiteOpenHelper {
                             cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_TITLE)),
                             cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_CREATED_AT)),
                             cursor.getLong(cursor.getColumnIndex(ReminderModel.COLUMN_SHOPPING_LIST_ID)),
-                            cursor.getLong(cursor.getColumnIndex(ReminderModel.COLUMN_MARKET_ID))
+                            cursor.getLong(cursor.getColumnIndex(ReminderModel.COLUMN_MARKET_ID)),
+                            cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_REMINDER_TIME))
 
                             )
                     );
@@ -392,7 +396,9 @@ public class DBHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_TITLE)),
                         cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_CREATED_AT)),
                         cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_SHOPPING_LIST_ID)),
-                        cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_MARKET_ID))
+                        cursor.getInt(cursor.getColumnIndex(ReminderModel.COLUMN_MARKET_ID)),
+                        cursor.getString(cursor.getColumnIndex(ReminderModel.COLUMN_REMINDER_TIME))
+
                 );
             }
         }

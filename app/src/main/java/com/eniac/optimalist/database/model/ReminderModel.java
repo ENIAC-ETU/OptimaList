@@ -8,6 +8,7 @@ public class ReminderModel {
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_SHOPPING_LIST_ID = "shopping_list_id";
     public static final String COLUMN_MARKET_ID = "market_id";
+    public static final String COLUMN_REMINDER_TIME = "reminder_time";
 
 
 
@@ -18,6 +19,7 @@ public class ReminderModel {
     private String createdAt;
     private long shopping_list_id;
     private long market_id;
+    private String reminder_time;
 
 
     public static final String CREATE_TABLE =
@@ -26,15 +28,17 @@ public class ReminderModel {
                     + COLUMN_TITLE + " text,"
                     + COLUMN_CREATED_AT + " datetime default (DATETIME(CURRENT_TIMESTAMP, 'LOCALTIME')),"
                     + COLUMN_SHOPPING_LIST_ID + " integer, "
-                    + COLUMN_MARKET_ID + " integer "
+                    + COLUMN_MARKET_ID + " integer, "
+                    + COLUMN_REMINDER_TIME + " datetime"
                     + ")";
 
-    public ReminderModel(int id, String title, String createdAt, long shopping_list_id, long market_id) {
+    public ReminderModel(int id, String title, String createdAt, long shopping_list_id, long market_id, String reminder_time) {
         this.id = id;
         this.title = title;
         this.createdAt = createdAt;
         this.shopping_list_id = shopping_list_id;
         this.market_id = market_id;
+        this.reminder_time=reminder_time;
     }
 
     public long getId() {
@@ -64,6 +68,10 @@ public class ReminderModel {
     public String toString() {
         return title;
     }
+
+    public String getReminder_time() {return reminder_time;}
+
+    public void setReminder_time(String s) {this.reminder_time=s;}
 
 
 }

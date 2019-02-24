@@ -1,6 +1,9 @@
 package com.eniac.optimalist.fragments;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,10 +23,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.eniac.optimalist.MainActivity;
@@ -39,9 +45,10 @@ import com.eniac.optimalist.utils.DividerItemDecoration;
 import com.eniac.optimalist.utils.RecyclerTouchListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-public class ShoppingListFragment extends Fragment {
+public class ShoppingListFragment extends Fragment implements DatePickerDialog.OnDateSetListener,TimePickerDialog.OnTimeSetListener {
 
     public static DBHelper db;
     private ShoppingListAdapter shoppingListAdapter;
@@ -53,6 +60,10 @@ public class ShoppingListFragment extends Fragment {
     private TextView noShoppingListView;
     public static long currentPositionId;
     public static String currentShoppingListTitle;
+
+    int day, month, year, hour, minute;
+    int dayFinal, monthFinal, yearFinal,hourFinal, minuteFinal;
+
 CheckBox location_box;
     @Nullable
     @Override
@@ -352,6 +363,22 @@ CheckBox location_box;
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getActivity().getApplicationContext());
         View view = layoutInflaterAndroid.inflate(R.layout.add_reminder_from_shopping_list, null);
 
+        Button datePickerButton = (Button) view.findViewById(R.id.datetime_picker_button2);
+        datePickerButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Calendar c = Calendar.getInstance();
+                year=c.get(Calendar.YEAR);
+                month=c.get(Calendar.MONTH);
+                day =c.get(Calendar.DAY_OF_MONTH);
+                DatePickerDialog.OnDateSetListener listener=ShoppingListFragment.this;
+                Context context=getContext();
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(context,listener,year,month,day);
+                datePickerDialog.show();
+            }
+        });
+
         final Spinner spinner2 = (Spinner) view.findViewById(R.id.rem_markets_spinner);
         ArrayAdapter<Market> dataAdapter2 = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, markets);
         dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -370,7 +397,8 @@ CheckBox location_box;
                 .setCancelable(false)
                 .setPositiveButton("kaydet", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogBox, int id) {
-                        createReminder(title.getText().toString(),shoppingLists.get(position).getId(),((Market)spinner2.getSelectedItem()).getId());
+                        createReminder(title.getText().toString(),shoppingLists.get(position).getId(),((Market)spinner2.getSelectedItem()).getId(),
+                                yearFinal+"-"+monthFinal+"-"+dayFinal+" "+hourFinal+":"+minuteFinal+":00");
                     }
                 })
                 .setNegativeButton("iptal",
@@ -386,17 +414,18 @@ CheckBox location_box;
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    createReminder(title.getText().toString(),shoppingLists.get(position).getId(),((Market)spinner2.getSelectedItem()).getId());
+                    createReminder(title.getText().toString(),shoppingLists.get(position).getId(),((Market)spinner2.getSelectedItem()).getId(),
+                            yearFinal+"-"+monthFinal+"-"+dayFinal+" "+hourFinal+":"+minuteFinal+":00");
                 alertDialog.dismiss();
 
             }
         });
     }
 
-    private void createReminder(String title, long shopping_list_id, long market_id) {
+    private void createReminder(String title, long shopping_list_id, long market_id, String reminderTime) {
         // inserting reminder for shopping list in db and getting
         // newly inserted reminder id
-        long id = db.insertReminder(title, shopping_list_id, market_id);
+        long id = db.insertReminder(title, shopping_list_id, market_id, reminderTime);
 
         // get the newly inserted reminder from db
         ReminderModel r= db.getReminder(id);
@@ -408,6 +437,30 @@ CheckBox location_box;
             // refreshing the list
             reminderAdapter.notifyDataSetChanged();
         }
+    }
+
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        yearFinal=year;
+        monthFinal=month+1;
+        dayFinal=dayOfMonth;
+
+        Calendar c =Calendar.getInstance();
+        hour=c.get(Calendar.HOUR_OF_DAY);
+        minute=c.get(Calendar.MINUTE);
+
+        Context context=getContext();
+        TimePickerDialog.OnTimeSetListener listener=ShoppingListFragment.this;
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(context,listener,
+                hour,minute,android.text.format.DateFormat.is24HourFormat(getContext()));
+        timePickerDialog.show();
+
+    }
+
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        hourFinal=hourOfDay;
+        minuteFinal=minute;
     }
 
 }

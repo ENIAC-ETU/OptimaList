@@ -27,12 +27,14 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.MyView
         public TextView reminder;
         public TextView dot;
         public TextView timestamp;
+        public TextView reminderTime;
 
         public MyViewHolder(View view) {
             super(view);
             reminder = view.findViewById(R.id.reminder);
             dot = view.findViewById(R.id.dot);
             timestamp = view.findViewById(R.id.timestamp);
+            reminderTime = view.findViewById(R.id.reminderTimeStamp);
         }
     }
 
@@ -60,6 +62,8 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.MyView
 
         // Formatting and displaying timestamp
         holder.timestamp.setText(formatDate(reminder.getCreatedAt()));
+
+        holder.reminderTime.setText(formatDate(reminder.getReminder_time()));
     }
 
     @Override

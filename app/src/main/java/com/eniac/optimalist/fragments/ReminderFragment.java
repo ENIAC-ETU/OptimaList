@@ -1,6 +1,9 @@
 package com.eniac.optimalist.fragments;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,10 +18,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
+import com.eniac.optimalist.MainActivity;
 import com.eniac.optimalist.R;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.Market;
@@ -29,16 +36,23 @@ import com.eniac.optimalist.utils.RecyclerTouchListener;
 import com.eniac.optimalist.adapters.ReminderAdapter;
 
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-public class ReminderFragment extends Fragment {
+public class ReminderFragment extends Fragment implements DatePickerDialog.OnDateSetListener,TimePickerDialog.OnTimeSetListener {
 
     private DBHelper db;
     private ReminderAdapter reminderAdapter;
     private List<ReminderModel> reminders = new ArrayList<>();
     private List<Market> markets = new ArrayList<>();
     private List<ShoppingList> shopping_lists = new ArrayList<>();
+
+    int day, month, year, hour, minute;
+    int dayFinal, monthFinal, yearFinal,hourFinal, minuteFinal;
+    boolean timePicked=false ;
 
     private RecyclerView recyclerView;
     private TextView noReminderView;
@@ -82,7 +96,6 @@ public class ReminderFragment extends Fragment {
         recyclerView.setAdapter(reminderAdapter);
 
         toggleEmptyReminders();
-
         /*
          * On long press on RecyclerView item, open alert dialog
          * with options to choose
@@ -116,10 +129,10 @@ public class ReminderFragment extends Fragment {
         toggleEmptyReminders();
     }
 
-    private void createReminder(String title, long shopping_list_id, long market_id) {
+    private void createReminder(String title, long shopping_list_id, long market_id,String reminderTime) {
         // inserting reminder for shopping list in db and getting
         // newly inserted reminder id
-        long id = db.insertReminder(title, shopping_list_id, market_id);
+        long id = db.insertReminder(title, shopping_list_id, market_id,reminderTime);
 
         // get the newly inserted reminder from db
         ReminderModel r= db.getReminder(id);
@@ -135,12 +148,13 @@ public class ReminderFragment extends Fragment {
         }
     }
 
-    private void updateReminder(String title, long shopping_list_id, long market_id, int position) {
+    private void updateReminder(String title, long shopping_list_id, long market_id, int position,String reminderTime) {
         ReminderModel r = reminders.get(position);
         // updating reminder title
         r.setTitle(title);
         r.setMarketId(market_id);
         r.setShoppingListId(shopping_list_id);
+        r.setReminder_time(reminderTime);
 
         // updating note in db
         db.updateReminder(r);
@@ -180,6 +194,23 @@ public class ReminderFragment extends Fragment {
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getActivity().getApplicationContext());
         View view = layoutInflaterAndroid.inflate(R.layout.add_reminder_dialog, null);
 
+        Button datePickerButton = (Button) view.findViewById(R.id.datetime_picker_button1);
+        datePickerButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                timePicked=false;
+                Calendar c = Calendar.getInstance();
+                year=c.get(Calendar.YEAR);
+                month=c.get(Calendar.MONTH);
+                day =c.get(Calendar.DAY_OF_MONTH);
+                DatePickerDialog.OnDateSetListener listener=ReminderFragment.this;
+                Context context=getContext();
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(context,listener,year,month,day);
+                datePickerDialog.show();
+            }
+        });
+
         final Spinner spinner1 = (Spinner) view.findViewById(R.id.rem_shopping_list_spinner);
         ArrayAdapter<ShoppingList> dataAdapter1 = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, shopping_lists);
         dataAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -203,7 +234,7 @@ public class ReminderFragment extends Fragment {
                 .setCancelable(false)
                 .setPositiveButton("kaydet", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogBox, int id) {
-                        createReminder(title.getText().toString(),((ShoppingList)spinner1.getSelectedItem()).getId(),((Market)spinner2.getSelectedItem()).getId());
+                        createReminder(title.getText().toString(),((ShoppingList)spinner1.getSelectedItem()).getId(),((Market)spinner2.getSelectedItem()).getId(),"");
                     }
                 })
                 .setNegativeButton("iptal",
@@ -220,9 +251,11 @@ public class ReminderFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(shouldUpdate)
-                    updateReminder(title.getText().toString(),((ShoppingList)spinner1.getSelectedItem()).getId(),((Market)spinner2.getSelectedItem()).getId(),position);
+                    updateReminder(title.getText().toString(),((ShoppingList)spinner1.getSelectedItem()).getId(),((Market)spinner2.getSelectedItem()).getId(),position,
+                            yearFinal+"-"+monthFinal+"-"+dayFinal+" "+hourFinal+":"+minuteFinal+":00");
                 else
-                    createReminder(title.getText().toString(),((ShoppingList)spinner1.getSelectedItem()).getId(),((Market)spinner2.getSelectedItem()).getId());
+                    createReminder(title.getText().toString(),((ShoppingList)spinner1.getSelectedItem()).getId(),((Market)spinner2.getSelectedItem()).getId(),
+                            yearFinal+"-"+monthFinal+"-"+dayFinal+" "+hourFinal+":"+minuteFinal+":00");
                 alertDialog.dismiss();
 
             }
@@ -260,5 +293,32 @@ public class ReminderFragment extends Fragment {
                 }
             }
         }
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        yearFinal=year;
+        monthFinal=month+1;
+        dayFinal=dayOfMonth;
+
+        Calendar c =Calendar.getInstance();
+        hour=c.get(Calendar.HOUR_OF_DAY);
+        minute=c.get(Calendar.MINUTE);
+
+        Context context=getContext();
+        TimePickerDialog.OnTimeSetListener listener=ReminderFragment.this;
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(context,listener,
+                hour,minute,android.text.format.DateFormat.is24HourFormat(getContext()));
+        timePickerDialog.show();
+
+    }
+
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        hourFinal=hourOfDay;
+        minuteFinal=minute;
+
+        timePicked=true;
     }
 }
