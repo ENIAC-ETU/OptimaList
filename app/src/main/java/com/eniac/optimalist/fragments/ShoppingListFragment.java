@@ -1,5 +1,6 @@
 package com.eniac.optimalist.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -13,6 +14,8 @@ import android.support.annotation.Nullable;
 import com.eniac.optimalist.activities.ImageActivity;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTabHost;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -113,7 +116,7 @@ CheckBox location_box;
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), ImageActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,1313);
             }
         });
 
@@ -153,6 +156,18 @@ CheckBox location_box;
                 showActionsDialog(position);
             }
         }));
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode == 1313) {
+            ShoppingList list=db.getShoppingList((long)resultCode);
+            shoppingLists.add(0,list);
+            Toast.makeText(getContext(),list.getTitle()+" Listesi Oluşturuldu",Toast.LENGTH_SHORT).show();
+            shoppingListAdapter.notifyDataSetChanged();
+        }
+
     }
 
 

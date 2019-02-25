@@ -1,5 +1,6 @@
 package com.eniac.optimalist.activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +25,8 @@ import android.Manifest;
 
 import com.eniac.optimalist.R;
 import com.eniac.optimalist.adapters.OCRAdapter;
+import com.eniac.optimalist.database.DBHelper;
+import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.utils.OCRParsedItem;
 import com.eniac.optimalist.utils.OCRRawItem;
 import com.eniac.optimalist.utils.PermissionUtils;
@@ -66,11 +69,13 @@ public class ImageActivity extends AppCompatActivity {
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
     public static final String FILE_NAME = "temp.jpg";
+    DBHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image2);
+        db = DBHelper.getInstance(this);
         btn_gallery = (Button) findViewById(R.id.button_image);
         btn_camera = (Button) findViewById(R.id.button_camera);
         img= (ImageView) findViewById(R.id.imageView);
@@ -91,6 +96,7 @@ public class ImageActivity extends AppCompatActivity {
                 startCamera();
             }
         });
+
     }
 
     public void startCamera() {
@@ -329,12 +335,18 @@ public class ImageActivity extends AppCompatActivity {
             ocrAdapter = new OCRAdapter(context, parsedItems);
             lv.setAdapter(ocrAdapter);
             final EditText dateText = (EditText) findViewById(R.id.ocrDate);
+            final EditText listName = (EditText) findViewById(R.id.ocrListName);
             dateText.setText(date);
             Button acceptOCR = (Button) findViewById(R.id.acceptOCR);
             acceptOCR.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Log.d("PatternMatch", "Date: " + dateText.getText() + ", Parsed items: " + OCRAdapter.ocrParsedItemList.toString());
+
+                    ShoppingList list=createShoppingListFromOCR(listName.getText().toString(),OCRAdapter.ocrParsedItemList);
+                    setResult((int)list.getId());
+                    finish();
+
                 }
             });
             progressDialog.dismiss();
@@ -359,5 +371,21 @@ public class ImageActivity extends AppCompatActivity {
             resizedWidth = maxDimension;
         }
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
+    }
+
+    public ShoppingList createShoppingListFromOCR(String name, List<OCRParsedItem> parsedItems){
+        //creates a new shopping list
+
+        // inserting shopping list in db and getting
+        // newly inserted shopping list id
+        long id = db.insertShoppingList(name);
+
+        // get the newly inserted shopping list from db
+        ShoppingList list = db.getShoppingList(id);
+
+        for(OCRParsedItem item:parsedItems) {
+            long itemId =db.insertItemList(item.getName(),1 , Float.parseFloat(item.getPrice()),list.getId());
+        }
+        return list;
     }
 }

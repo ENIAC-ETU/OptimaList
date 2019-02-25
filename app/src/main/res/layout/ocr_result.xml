@@ -7,7 +7,29 @@
     android:layout_height="match_parent"
     tools:context=".activities.ImageActivity">
 
+
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000"
+            android:text="Liste Adı:"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/ocrListName"
+            android:paddingLeft="10dp"
+            android:textColor="#000"
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="50dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -31,7 +53,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="100dp"
         android:background="@color/colorPrimary" />
 
     <ListView
@@ -41,7 +63,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="66dp"
+        android:layout_marginTop="116dp"
         android:layout_marginBottom="50dp"
         android:layout_weight="5"
         android:divider="@null" />
