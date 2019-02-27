@@ -1,28 +1,41 @@
 package com.eniac.optimalist.database;
 
+import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import com.eniac.optimalist.database.model.ItemList;
 import com.eniac.optimalist.database.model.Market;
 import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.database.model.ReminderModel;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class DBHelper extends SQLiteOpenHelper {
 
     private static DBHelper sInstance;
     private static final String DATABASE_NAME = "optimalist.db";
-
+    private static Context mainContext;
     public static synchronized DBHelper getInstance(Context context) {
         if (sInstance == null) {
             sInstance = new DBHelper(context.getApplicationContext());
+            mainContext=context;
         }
         return sInstance;
     }
@@ -403,5 +416,42 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
             return reminder;
+    }
+    public List<Integer> queryDatesOfItem(ItemList itemList) throws ParseException {
+        List<Integer> itemLists = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Calendar p = Calendar.getInstance();
+
+        try (Cursor cursor = db.query(ItemList.TABLE_NAME, null, ItemList.COLUMN_TITLE + " = " + "'"+itemList.getTitle()+"'", null, null, null, ItemList.COLUMN_CREATED_AT + " desc")){
+            if (cursor.moveToFirst()) {
+                do {
+                    if (cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)).equals(itemList.getTitle())) {
+                        DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+                        Date date = fmt.parse(cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CREATED_AT)));
+                        p.setTime(date);
+                        Log.d("MyLocation:time", "" + p.toString());
+                        itemLists.add(p.get(Calendar.DAY_OF_YEAR));
+                    }
+                } while (cursor.moveToNext());
+            }
+        }
+        Collections.sort(itemLists);
+        return itemLists;
+    }
+    public void saveHashMap(String key , Object obj) {
+        SharedPreferences prefs = mainContext.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(obj);
+        editor.putString(key,json);
+        editor.apply();
+    }
+    public HashMap<Integer,List<ItemList>> getHashMap(String key) {
+        SharedPreferences prefs = mainContext.getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = prefs.getString(key,"");
+        java.lang.reflect.Type type = new TypeToken<HashMap<Integer,List<ItemList>>>(){}.getType();
+        HashMap<Integer,List<ItemList>> obj = gson.fromJson(json, type);
+        return obj;
     }
 }

@@ -91,7 +91,7 @@ public class LocationService extends Service
             float distance=A.distanceTo(B);
             ReminderModel m=db.getMarketSpecificReminder(lastClosest);
             if (distance <distanceLimit && m!=null){
-                notify.setNotification(getApplicationContext(), "Reminder:"+m.getTitle(),  "ShopList:"+db.getShoppingList(m.get_shopping_list_id()).getTitle(), 1);
+                notify.setNotification(getApplicationContext(), "Reminder:"+m.getTitle(),  "ShopList:"+db.getShoppingList(m.get_shopping_list_id()).getTitle()+" Uzaklık:"+(int)distance+"metre", 1);
                 changed=false;
                 return true;
             }

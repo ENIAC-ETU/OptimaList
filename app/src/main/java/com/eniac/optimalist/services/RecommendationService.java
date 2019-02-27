@@ -25,16 +25,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RecommendationService {
-    private DBHelper db;
-    private ReminderFragment rf;
-    private ShoppingList sl;
+    private static DBHelper db;
     private long reminderId;
-    public RecommendationService(){
+    private static HashMap<Integer,List<ItemList>> calendar;
+    private static HashMap<ItemList,Integer> itemDate; //eski item tarihini guncellemek icin
 
+    private static RecommendationService rs;
+
+    public static synchronized RecommendationService getInstance(Context p) {
+        if (rs == null) {
+            rs = new RecommendationService(p);
+        }
+        return rs;
     }
-    public RecommendationService(Context p){
+    private RecommendationService(Context p){
         db = DBHelper.getInstance(p.getApplicationContext());
-        rf=new ReminderFragment();
+        calendar=db.getHashMap("key");
+        if (calendar==null){
+            calendar=new HashMap<Integer,List<ItemList>>(365);
+            db.saveHashMap("key",calendar);
+        }
         items=db.getAllItemLists();
         itemScore=new HashMap<ItemList, Integer>();
     }
@@ -94,7 +104,10 @@ public class RecommendationService {
         return (int)( (toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
     }
     public List<ItemList> getRecommendedList(){
-        List<ItemList> newList=new ArrayList<>();
+        Calendar c=Calendar.getInstance();
+        int a=c.get(Calendar.DAY_OF_YEAR);
+
+        /*List<ItemList> newList=new ArrayList<>();
         List<String> nameList=new ArrayList<>();
         Iterator it = itemScore.entrySet().iterator();
         while (it.hasNext()) {
@@ -106,8 +119,24 @@ public class RecommendationService {
                     nameList.add(p.getTitle());
                 }
             }
+        }*/
+        return calendar.get(a);
+    }
+    public List<Integer> getDateList(ItemList item) throws ParseException {
+        List<Integer> p=db.queryDatesOfItem(item);
+
+        return p;
+    }
+    public void setRecommendationDate(ItemList e,int day){
+        Calendar c=Calendar.getInstance();
+        int a=c.get(Calendar.DAY_OF_YEAR);
+        List<ItemList> p=calendar.get(a+day);
+        if (p==null){
+            p=new ArrayList<ItemList>() ;
         }
-        return newList;
+        p.add(e);
+        calendar.put(a+day,p);
+        db.saveHashMap("key",calendar);
     }
     public void createReminderFromRecom(){
         initializeShoppingListToMap();
@@ -123,11 +152,20 @@ public class RecommendationService {
         if(reminderId!=-1)
             db.deleteShoppingList(db.getShoppingList(reminderId));
         reminderId=db.insertShoppingList("Recommended");
+        if (getRecommendedList()!=null)
         for (ItemList e:getRecommendedList()){
             db.insertItemList(e.getTitle(),1,1.8f,reminderId);
         }
-
-
     }
 
+    public void updateRecommendationFromNewList(long id) throws ParseException {
+        List<ItemList> temp=db.getCurrentItems(id);
+        HashMap<String,List<Integer>> p=new HashMap<>();
+        for (ItemList e:temp){
+            p.put(e.getTitle(),getDateList(e));
+            //setRecommendationDate(e,59);
+        }
+        Log.d("MyLocation:e",""+p.toString());
+        //Log.d("MyLocation:e",""+calendar.get(117).get(0).getTitle());
+    }
 }

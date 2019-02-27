@@ -27,6 +27,7 @@ import com.eniac.optimalist.R;
 import com.eniac.optimalist.adapters.OCRAdapter;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ShoppingList;
+import com.eniac.optimalist.services.RecommendationService;
 import com.eniac.optimalist.utils.OCRParsedItem;
 import com.eniac.optimalist.utils.OCRRawItem;
 import com.eniac.optimalist.utils.PermissionUtils;
@@ -49,6 +50,7 @@ import com.google.api.services.vision.v1.model.Word;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -346,6 +348,12 @@ public class ImageActivity extends AppCompatActivity {
                     ShoppingList list=createShoppingListFromOCR(listName.getText().toString(),OCRAdapter.ocrParsedItemList);
                     setResult((int)list.getId());
                     finish();
+                    RecommendationService p=RecommendationService.getInstance(getApplicationContext());
+                    try {
+                        p.updateRecommendationFromNewList(list.getId());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
 
                 }
             });

@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
             LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
             MainActivity.this.mService = (LocationService) binder.getService();
             mBound = true;
@@ -107,7 +106,7 @@ public class MainActivity extends AppCompatActivity
         if (serviceStatus) {
             startService(locationIntent);
             Log.d("MyLocation:","hey");
-            p1=new RecommendationService(getApplicationContext());
+            p1=RecommendationService.getInstance(getApplicationContext());
             p1.createReminderFromRecom();
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
