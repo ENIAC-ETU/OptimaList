@@ -162,12 +162,15 @@ CheckBox location_box;
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode,resultCode,data);
         if(requestCode == 1313) {
-            ShoppingList list=db.getShoppingList((long)resultCode);
-            shoppingLists.add(0,list);
-            Toast.makeText(getContext(),list.getTitle()+" Listesi Oluşturuldu",Toast.LENGTH_SHORT).show();
-            shoppingListAdapter.notifyDataSetChanged();
-        }
+            ShoppingList list = db.getShoppingList((long) resultCode);
+            if (list != null) {
+                shoppingLists.add(0, list);
+                shoppingListAdapter.notifyDataSetChanged();
+                toggleEmptyShoppingLists();
+                Toast.makeText(getContext(), list.getTitle() + " Listesi Oluşturuldu", Toast.LENGTH_SHORT).show();
+            }
 
+        }
     }
 
 

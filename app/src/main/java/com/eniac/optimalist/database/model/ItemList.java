@@ -8,6 +8,7 @@ public class ItemList {
     public static final String COLUMN_SHOPPING_LIST_ID = "shopping_list_id";
     public static final String COLUMN_AMOUNT = "amount";
     public static final String COLUMN_PRICE = "price";
+    public static final String COLUMN_CATEGORY = "category";
 
 
     private long id;
@@ -16,6 +17,7 @@ public class ItemList {
     private String createdAt;
     private int amount;
     private float price;
+    private String category;
 
     public static final String CREATE_TABLE =
             "create table " + TABLE_NAME + "("
@@ -24,16 +26,18 @@ public class ItemList {
                     + COLUMN_TITLE + " text,"
                     + COLUMN_AMOUNT + " integer,"
                     + COLUMN_PRICE + " real,"
-                    + COLUMN_CREATED_AT + " datetime default (DATETIME(CURRENT_TIMESTAMP, 'LOCALTIME'))"
+                    + COLUMN_CREATED_AT + " datetime default (DATETIME(CURRENT_TIMESTAMP, 'LOCALTIME')),"
+                    + COLUMN_CATEGORY + " text"
                     + ")";
 
-    public ItemList(int id, String title, int amount, float price, String createdAt, int shopping_list_id) {
+    public ItemList(int id, String title, int amount, float price, String createdAt, int shopping_list_id, String category) {
         this.id = id;
         this.title = title;
         this.createdAt = createdAt;
         this.shopping_list_id=shopping_list_id;
         this.amount=amount;
         this.price=price;
+        this.category=category;
     }
 
     public long getId() {
@@ -60,4 +64,7 @@ public class ItemList {
 
     public int getAmount (){return amount;}
 
+    public String getCategory() { return category; }
+
+    public void setCategory(String category) { this.category=category; }
 }

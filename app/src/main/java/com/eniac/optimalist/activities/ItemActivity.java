@@ -290,7 +290,7 @@ public class ItemActivity extends AppCompatActivity {
 
 
                     if(!(db.isInclude(shop_id,text.getText().toString()))) {
-                        addItemToShoppingList(inputItemName.getText().toString(), inputAmount.getValue(), Float.parseFloat(inputPrice.getText().toString()));
+                        addItemToShoppingList(inputItemName.getText().toString(), inputAmount.getValue(), Float.parseFloat(inputPrice.getText().toString()),"Iteme kategori ekle");
 
                     }else{
                         showRenameItem();
@@ -302,10 +302,10 @@ public class ItemActivity extends AppCompatActivity {
         }
 
 
-    private void addItemToShoppingList(String item,int amount,float price){
+    private void addItemToShoppingList(String item,int amount,float price,String category){
 
 
-        long id = db.insertItemList(item, amount, price, shop_id);
+        long id = db.insertItemList(item, amount, price, category, shop_id);
 
         ItemList l = db.getItemList(id);
 

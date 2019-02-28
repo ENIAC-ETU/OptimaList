@@ -6,18 +6,32 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.eniac.optimalist.R;
 import com.eniac.optimalist.utils.OCRParsedItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OCRAdapter extends BaseAdapter {
 
     private Context context;
     public static List<OCRParsedItem> ocrParsedItemList;
+    public String[] categories={"Kategori Seçiniz...",
+            "Meyve, Sebze",
+            "Et, Balık",
+            "Süt, Kahvaltılık",
+            "Gıda, Şekerleme",
+            "İçecek",
+            "Deterjan, Temizlik",
+            "Kağıt, Kozmetik",
+            "Bebek, Oyuncak",
+            "Ev, Pet"};
 
     public OCRAdapter(Context context, List<OCRParsedItem> ocrParsedItemList) {
         this.context = context;
@@ -61,6 +75,10 @@ public class OCRAdapter extends BaseAdapter {
 
             holder.nameText = (EditText) convertView.findViewById(R.id.ocrProductName);
             holder.priceText = (EditText) convertView.findViewById(R.id.ocrProductPrice);
+            holder.category = (Spinner) convertView.findViewById(R.id.ocrCategory);
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, categories);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            holder.category.setAdapter(dataAdapter);
             convertView.setTag(holder);
         }else {
             // the getTag returns the viewHolder object set as a tag to the view
@@ -102,6 +120,21 @@ public class OCRAdapter extends BaseAdapter {
 
             }
         });
+        holder.category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position1, long id) {
+                if(((String)holder.category.getSelectedItem()).equals("Kategori Seçiniz..."))
+                    ocrParsedItemList.get(position).setCategory("Seçilmedi");
+                else
+                    ocrParsedItemList.get(position).setCategory((String)holder.category.getSelectedItem());
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                ocrParsedItemList.get(position).setCategory("Seçilmedi");
+            }
+        });
 
         return convertView;
     }
@@ -109,6 +142,7 @@ public class OCRAdapter extends BaseAdapter {
     private class ViewHolder {
         protected EditText nameText;
         protected EditText priceText;
+        protected Spinner category;
     }
 
 }

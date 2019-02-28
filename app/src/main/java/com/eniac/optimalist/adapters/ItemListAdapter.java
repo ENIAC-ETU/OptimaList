@@ -53,9 +53,9 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyView
         ItemList itemList = itemLists.get(position);
 
         if(itemList.getPrice()>0) {
-            holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle() + " Fiyat: " + itemList.getPrice());
+            holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle() + " Fiyat: " + itemList.getPrice()+ " Kategori: "+itemList.getCategory());
         }else{
-            holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle());
+            holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle()+ " Kategori: "+itemList.getCategory());
         }
 
         // Displaying dot from HTML character code

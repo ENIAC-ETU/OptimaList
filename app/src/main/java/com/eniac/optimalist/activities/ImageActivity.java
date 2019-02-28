@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.Manifest;
+import android.widget.Spinner;
 
 import com.eniac.optimalist.R;
 import com.eniac.optimalist.adapters.OCRAdapter;
@@ -324,7 +325,7 @@ public class ImageActivity extends AppCompatActivity {
                             String productName = line.toString().substring(0, m.start()).trim();
                             String price = splitLine[1].replace(',', '.').replaceAll("[^\\d.]", "");
                             Log.d("PatternMatch", "Name: " + productName + ", Price: " + price);
-                            parsedItems.add(new OCRParsedItem(productName, price));
+                            parsedItems.add(new OCRParsedItem(productName, price, "Seçilmedi"));
                         }
                     }
                 }
@@ -392,7 +393,7 @@ public class ImageActivity extends AppCompatActivity {
         ShoppingList list = db.getShoppingList(id);
 
         for(OCRParsedItem item:parsedItems) {
-            long itemId =db.insertItemList(item.getName(),1 , Float.parseFloat(item.getPrice()),list.getId());
+            long itemId =db.insertItemList(item.getName(),1 , Float.parseFloat(item.getPrice()),item.getCategory(),list.getId());
         }
         return list;
     }

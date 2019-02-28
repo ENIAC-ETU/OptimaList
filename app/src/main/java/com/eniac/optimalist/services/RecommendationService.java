@@ -154,7 +154,7 @@ public class RecommendationService {
         reminderId=db.insertShoppingList("Recommended");
         if (getRecommendedList()!=null)
         for (ItemList e:getRecommendedList()){
-            db.insertItemList(e.getTitle(),1,1.8f,reminderId);
+            db.insertItemList(e.getTitle(),1,1.8f,"Kategori Yok(recomm)",reminderId);
         }
     }
 
