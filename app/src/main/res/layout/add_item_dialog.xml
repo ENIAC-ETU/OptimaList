@@ -76,6 +76,10 @@
         android:inputType="number"
         android:hint="fiyat"
         />
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/add_item_category"/>
 
 
 

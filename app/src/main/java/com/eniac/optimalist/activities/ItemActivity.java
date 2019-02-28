@@ -254,6 +254,22 @@ public class ItemActivity extends AppCompatActivity {
             inputAmount.setMinValue(1);
             final EditText inputPrice = view.findViewById(R.id.price_input);
 
+            String[] categories={
+                    "Kategori Seçiniz...",
+                    "Meyve, Sebze",
+                    "Et, Balık",
+                    "Süt, Kahvaltılık",
+                    "Gıda, Şekerleme",
+                    "İçecek",
+                    "Deterjan, Temizlik",
+                    "Kağıt, Kozmetik",
+                    "Bebek, Oyuncak",
+                    "Ev, Pet"};
+
+            final Spinner categorySpinner = (Spinner) view.findViewById(R.id.add_item_category);
+            ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getApplication(), android.R.layout.simple_spinner_item, categories);
+            categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            categorySpinner.setAdapter(categoryAdapter);
 
             TextView dialogTitle = view.findViewById(R.id.add_item_dialog_title);
             dialogTitle.setText(getString(R.string.new_item));
@@ -290,7 +306,10 @@ public class ItemActivity extends AppCompatActivity {
 
 
                     if(!(db.isInclude(shop_id,text.getText().toString()))) {
-                        addItemToShoppingList(inputItemName.getText().toString(), inputAmount.getValue(), Float.parseFloat(inputPrice.getText().toString()),"Iteme kategori ekle");
+                        if (((String)categorySpinner.getSelectedItem()).equals("Kategori Seçiniz..."))
+                            addItemToShoppingList(inputItemName.getText().toString(), inputAmount.getValue(), Float.parseFloat(inputPrice.getText().toString()),"Seçilmedi");
+                        else
+                            addItemToShoppingList(inputItemName.getText().toString(), inputAmount.getValue(), Float.parseFloat(inputPrice.getText().toString()),(String) categorySpinner.getSelectedItem());
 
                     }else{
                         showRenameItem();
