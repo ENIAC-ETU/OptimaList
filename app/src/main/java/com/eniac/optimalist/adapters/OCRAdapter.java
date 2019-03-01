@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -76,6 +77,7 @@ public class OCRAdapter extends BaseAdapter {
             holder.nameText = (EditText) convertView.findViewById(R.id.ocrProductName);
             holder.priceText = (EditText) convertView.findViewById(R.id.ocrProductPrice);
             holder.category = (Spinner) convertView.findViewById(R.id.ocrCategory);
+            holder.delete_item_OCR = (Button) convertView.findViewById(R.id.delete_item_OCR);
             ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, categories);
             dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             holder.category.setAdapter(dataAdapter);
@@ -136,6 +138,23 @@ public class OCRAdapter extends BaseAdapter {
             }
         });
 
+
+        holder.delete_item_OCR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                ocrParsedItemList.remove(position);
+
+                notifyDataSetChanged();
+
+            }
+        });
+
+
+
+
+
         return convertView;
     }
 
@@ -143,6 +162,7 @@ public class OCRAdapter extends BaseAdapter {
         protected EditText nameText;
         protected EditText priceText;
         protected Spinner category;
+        protected Button delete_item_OCR;
     }
 
 }

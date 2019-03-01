@@ -71,6 +71,19 @@
             />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="Ürünü Sil"
+            android:id="@+id/delete_item_OCR"/>
+
+     </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
