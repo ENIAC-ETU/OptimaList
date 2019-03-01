@@ -134,6 +134,7 @@ public class ReminderFragment extends Fragment implements DatePickerDialog.OnDat
         // newly inserted reminder id
         long id = db.insertReminder(title, shopping_list_id, market_id,reminderTime);
 
+        ((MainActivity)getActivity()).updateAlarms();
         // get the newly inserted reminder from db
         ReminderModel r= db.getReminder(id);
 
@@ -155,9 +156,11 @@ public class ReminderFragment extends Fragment implements DatePickerDialog.OnDat
         r.setMarketId(market_id);
         r.setShoppingListId(shopping_list_id);
         r.setReminder_time(reminderTime);
+        ((MainActivity)getActivity()).updateAlarms();
 
         // updating note in db
         db.updateReminder(r);
+
 
         // refreshing the list
         reminders.set(position, r);

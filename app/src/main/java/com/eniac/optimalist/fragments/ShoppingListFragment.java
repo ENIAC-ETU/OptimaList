@@ -444,6 +444,8 @@ CheckBox location_box;
         // inserting reminder for shopping list in db and getting
         // newly inserted reminder id
         long id = db.insertReminder(title, shopping_list_id, market_id, reminderTime);
+        ((MainActivity)getActivity()).updateAlarms();
+
 
         // get the newly inserted reminder from db
         ReminderModel r= db.getReminder(id);

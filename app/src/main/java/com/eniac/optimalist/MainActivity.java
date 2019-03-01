@@ -1,7 +1,9 @@
 package com.eniac.optimalist;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
@@ -11,6 +13,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationManagerCompat;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,10 +27,12 @@ import android.app.NotificationManager;
 import android.support.v4.app.NotificationCompat;
 
 import com.eniac.optimalist.database.DBHelper;
+import com.eniac.optimalist.database.model.ReminderModel;
 import com.eniac.optimalist.fragments.MarketFragment;
 import com.eniac.optimalist.fragments.ReminderFragment;
 import com.eniac.optimalist.fragments.SettingFragment;
 import com.eniac.optimalist.fragments.ShoppingListFragment;
+import com.eniac.optimalist.services.AlertReminder;
 import com.eniac.optimalist.services.LocationService;
 import com.eniac.optimalist.services.RecommendationService;
 
@@ -37,6 +42,13 @@ import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.CheckBox;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -224,5 +236,27 @@ public class MainActivity extends AppCompatActivity
         }
         return locationMode != Settings.Secure.LOCATION_MODE_OFF;
     }
+    public void updateAlarms(){
+            Log.e("MainActivity update","Update Alarms called");
+        AlarmManager alarmManager =(AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        List<ReminderModel> reminders = db.getAllReminders();
+        Intent intent =new Intent(getApplicationContext(),AlertReminder.class);
+        for(ReminderModel rem:reminders){
+            try {
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = fmt.parse(rem.getReminder_time());
+                Calendar c=Calendar.getInstance();
+                c.setTime(date);
+                if(date.before(Calendar.getInstance().getTime()))
+                    continue;
+                intent.putExtra("send_rem_title",rem.getTitle());
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),1,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+                SimpleDateFormat fmtOut = new SimpleDateFormat("d MMM yyyy - HH:mm:ss");
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,c.getTimeInMillis(),pendingIntent);
+                Log.e("Reminder time",fmtOut.format(date));
+            } catch (ParseException e) {
 
+            }
+        }
+    }
 }
