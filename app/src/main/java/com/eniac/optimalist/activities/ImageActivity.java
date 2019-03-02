@@ -398,7 +398,16 @@ public class ImageActivity extends AppCompatActivity {
         AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(ImageActivity.this);
         alertDialogBuilderUserInput.setView(view);
 
-        final EditText inputItemName = view.findViewById(R.id.add_ocr_item);
+        //final EditText inputItemName = view.findViewById(R.id.add_ocr_item);
+
+        text=(AutoCompleteTextView) view.findViewById(R.id.add_ocr_item);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_list_item_1, items);
+        text.setAdapter(adapter);
+        text.setThreshold(1);
+
+        final EditText inputItemName = text;
 
 
         final EditText inputPrice = view.findViewById(R.id.ocr_price_input);
@@ -452,15 +461,18 @@ public class ImageActivity extends AppCompatActivity {
                     inputPrice.setText("0");
                 }
 
-
-
-
-                OCRParsedItem new_ocr_item = new OCRParsedItem(inputItemName.getText().toString(), inputPrice.getText().toString(),(String) categorySpinner.getSelectedItem());
-                OCRAdapter.ocrParsedItemList.add(new_ocr_item);
+                add_OCR_item(inputItemName.getText().toString(), inputPrice.getText().toString(),(String) categorySpinner.getSelectedItem());
 
 
             }
         });
+
+    }
+
+    private void add_OCR_item(String itemName, String price, String category){
+
+        OCRParsedItem new_ocr_item = new OCRParsedItem(itemName, price, category);
+        OCRAdapter.ocrParsedItemList.add(new_ocr_item);
 
     }
 
