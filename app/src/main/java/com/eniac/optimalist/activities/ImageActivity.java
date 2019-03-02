@@ -1,8 +1,10 @@
 package com.eniac.optimalist.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -16,13 +18,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.Manifest;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.eniac.optimalist.R;
 import com.eniac.optimalist.adapters.OCRAdapter;
@@ -73,6 +80,11 @@ public class ImageActivity extends AppCompatActivity {
     public static final int CAMERA_IMAGE_REQUEST = 3;
     public static final String FILE_NAME = "temp.jpg";
     DBHelper db;
+    public AutoCompleteTextView text;
+
+    private static final String[] items = new String[] {
+            "Kahve","Yumurta","Süt","Domates", "Peynir"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -341,6 +353,8 @@ public class ImageActivity extends AppCompatActivity {
             final EditText listName = (EditText) findViewById(R.id.ocrListName);
             dateText.setText(date);
             Button acceptOCR = (Button) findViewById(R.id.acceptOCR);
+
+
             acceptOCR.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -358,9 +372,99 @@ public class ImageActivity extends AppCompatActivity {
 
                 }
             });
+
+            Button add_item_OCR = (Button) findViewById(R.id.add_item_OCR);
+
+            add_item_OCR.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                add_OCR_item_dialog();
+
+                }
+            });
+
+
             progressDialog.dismiss();
         }
     }
+
+
+    private void add_OCR_item_dialog() {
+        LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
+        View view = layoutInflaterAndroid.inflate(R.layout.add_ocr_item_dialog, null);
+
+
+        AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(ImageActivity.this);
+        alertDialogBuilderUserInput.setView(view);
+
+        final EditText inputItemName = view.findViewById(R.id.add_ocr_item);
+
+
+        final EditText inputPrice = view.findViewById(R.id.ocr_price_input);
+
+        String[] categories={
+                "Kategori Seçiniz...",
+                "Meyve, Sebze",
+                "Et, Balık",
+                "Süt, Kahvaltılık",
+                "Gıda, Şekerleme",
+                "İçecek",
+                "Deterjan, Temizlik",
+                "Kağıt, Kozmetik",
+                "Bebek, Oyuncak",
+                "Ev, Pet"};
+
+        final Spinner categorySpinner = (Spinner) view.findViewById(R.id.add_ocr_item_category);
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getApplication(), android.R.layout.simple_spinner_item, categories);
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(categoryAdapter);
+
+        TextView dialogTitle = view.findViewById(R.id.add_ocr_item_dialog_title);
+        dialogTitle.setText(getString(R.string.new_item));
+
+
+        alertDialogBuilderUserInput
+                .setCancelable(false)
+                .setPositiveButton("kaydet", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogBox, int id) {
+
+                    }
+                })
+                .setNegativeButton("iptal",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialogBox, int id) {
+                                dialogBox.cancel();
+                            }
+                        });
+
+        final AlertDialog alertDialog = alertDialogBuilderUserInput.create();
+        alertDialog.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                alertDialog.dismiss();
+
+                if (inputPrice.getText().toString().trim().isEmpty()) {
+                    inputPrice.setText("0");
+                }
+
+
+
+
+                OCRParsedItem new_ocr_item = new OCRParsedItem(inputItemName.getText().toString(), inputPrice.getText().toString(),(String) categorySpinner.getSelectedItem());
+                OCRAdapter.ocrParsedItemList.add(new_ocr_item);
+
+
+            }
+        });
+
+    }
+
+
 
     private Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
 

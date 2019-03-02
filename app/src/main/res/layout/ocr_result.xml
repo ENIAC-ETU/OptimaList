@@ -72,10 +72,23 @@
         android:id="@+id/acceptOCR"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/listView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="-50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="57dp"
         android:layout_weight="1"
         android:text="Onayla" />
+
+
+    <Button
+        android:id="@+id/add_item_OCR"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="35dp"
+        android:layout_weight="1"
+        android:text="ekle" />
+
+
 
 </RelativeLayout>
