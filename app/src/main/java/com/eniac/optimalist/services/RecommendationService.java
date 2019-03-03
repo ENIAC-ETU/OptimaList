@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.eniac.optimalist.activities.RecommendationActivity;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ItemList;
 import com.eniac.optimalist.database.model.ShoppingList;
@@ -28,10 +29,10 @@ public class RecommendationService {
     private static DBHelper db;
     private long reminderId;
     private static HashMap<Integer,List<ItemList>> calendar;
-    private static HashMap<ItemList,Integer> itemDate; //eski item tarihini guncellemek icin
+    private static HashMap<Long,Integer> itemDate;
 
     private static RecommendationService rs;
-
+    private static RecommendationActivity ra;
     public static synchronized RecommendationService getInstance(Context p) {
         if (rs == null) {
             rs = new RecommendationService(p);
@@ -40,24 +41,22 @@ public class RecommendationService {
     }
     private RecommendationService(Context p){
         db = DBHelper.getInstance(p.getApplicationContext());
-        calendar=db.getHashMap("key");
+        ra=new RecommendationActivity();
+        calendar=(HashMap<Integer,List<ItemList>>)db.getHashMap("key");
+        itemDate=(HashMap<Long,Integer>)db.getHashMap("key");
         if (calendar==null){
             calendar=new HashMap<Integer,List<ItemList>>(365);
             db.saveHashMap("key",calendar);
         }
+        if(itemDate==null){
+            itemDate=new HashMap<Long,Integer>();
+            db.saveHashMap("key1",itemDate);
+
+        }
         items=db.getAllItemLists();
-        itemScore=new HashMap<ItemList, Integer>();
     }
     private List<ItemList> items;
-    private Map<ItemList,Integer> itemScore;
-    private int threshold=0;
 
-    public void initializeShoppingListToMap(){
-        for (ItemList e:items){
-            int numberOfItem=getNumberOfItemsInShoppingList(e);
-            itemScore.put(e,calculateScore(e.getId(),e.getCreatedAt(),numberOfItem));
-        }
-    }
     private int calculateScore(long itemNumber, String lastItemDate,int countOfItem) {
         DateFormat formatter ;
         Date date,date2;
@@ -135,11 +134,10 @@ public class RecommendationService {
             p=new ArrayList<ItemList>() ;
         }
         p.add(e);
-        calendar.put(a+day,p);
+        calendar.put(day,p);
         db.saveHashMap("key",calendar);
     }
     public void createReminderFromRecom(){
-        initializeShoppingListToMap();
         List<ShoppingList> temp=db.getAllShoppingLists();
         reminderId=-1;
         for (ShoppingList e:temp){
@@ -158,7 +156,7 @@ public class RecommendationService {
         }
     }
 
-    public void updateRecommendationFromNewList(long id) throws ParseException {
+    public void updateRecommendationFromNewList(long id) throws Exception {
         List<ItemList> temp=db.getCurrentItems(id);
         HashMap<String,List<Integer>> p=new HashMap<>();
         for (ItemList e:temp){
@@ -166,6 +164,24 @@ public class RecommendationService {
             //setRecommendationDate(e,59);
         }
         Log.d("MyLocation:e",""+p.toString());
+        HashMap<String, Integer> myMap=ra.sendPost(p);
+        for (String e:myMap.keySet()){
+            ItemList item=db.findItemByTitle(e);
+            if (item!=null) {
+                checkPreviousDates(item, myMap.get(e));
+                setRecommendationDate(item, myMap.get(e));
+            }
+        }
         //Log.d("MyLocation:e",""+calendar.get(117).get(0).getTitle());
+
+    }
+
+    private void checkPreviousDates(ItemList item,Integer e) {
+        if (itemDate.get(item.getId())!=null && calendar.get(item.getId())!=null){
+            int latestDay=itemDate.get(item.getId());
+            calendar.get(latestDay).remove(item);
+            db.saveHashMap("key1",itemDate);
+        }
+        itemDate.put(item.getId(),e);
     }
 }

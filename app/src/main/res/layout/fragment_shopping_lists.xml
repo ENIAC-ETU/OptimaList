@@ -60,15 +60,4 @@
 
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
-    <CheckBox
-        android:id="@+id/checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_marginBottom="16dp"
-        android:text="Konum Al"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
 </android.support.constraint.ConstraintLayout>

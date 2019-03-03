@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -67,30 +66,11 @@ public class ShoppingListFragment extends Fragment implements DatePickerDialog.O
     int day, month, year, hour, minute;
     int dayFinal, monthFinal, yearFinal,hourFinal, minuteFinal;
 
-CheckBox location_box;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_shopping_lists, container, false);
-        location_box = (CheckBox) root.findViewById(R.id.checkbox);
-        checkLocationBox();
         return root;
-    }
-    private void checkLocationBox(){
-        Log.d("MyLocation:",(location_box==null)+"");
-        location_box.setChecked(true);
-        location_box.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                ((MainActivity)getActivity()).changeLocationServiceStatus();
-                if(location_box.isChecked()){
-                    Log.d("MyLocation:","Checked");
-                }else{
-                    Log.d("MyLocation:","Un-Checked");
-                }
-            }
-        });
     }
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {

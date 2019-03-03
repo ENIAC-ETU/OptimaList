@@ -446,12 +446,44 @@ public class DBHelper extends SQLiteOpenHelper {
         editor.putString(key,json);
         editor.apply();
     }
-    public HashMap<Integer,List<ItemList>> getHashMap(String key) {
+    public Object getHashMap(String key) {
         SharedPreferences prefs = mainContext.getSharedPreferences("prefs", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = prefs.getString(key,"");
-        java.lang.reflect.Type type = new TypeToken<HashMap<Integer,List<ItemList>>>(){}.getType();
-        HashMap<Integer,List<ItemList>> obj = gson.fromJson(json, type);
-        return obj;
+        if (key.equals("key")){
+            java.lang.reflect.Type type = new TypeToken<HashMap<Integer,List<ItemList>>>(){}.getType();
+            HashMap<Integer,List<ItemList>> obj = gson.fromJson(json, type);
+            return obj;
+
+        }else{
+            java.lang.reflect.Type type = new TypeToken<HashMap<Long,Integer>>(){}.getType();
+            HashMap<Long,Integer> obj = gson.fromJson(json, type);
+            return obj;
+
+        }
+
+    }
+
+    public ItemList findItemByTitle(String e) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ItemList itemList=null;
+        try (Cursor cursor = db.query(ItemList.TABLE_NAME, null, ItemList.COLUMN_TITLE + " = " + "'"+e+"'", null, null, null, ItemList.COLUMN_CREATED_AT + " desc")){
+            if (cursor.moveToFirst()) {
+                do {
+                    if (cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)).equals(e)) {
+                        itemList = new ItemList(
+                                cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_ID)),
+                                cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)),
+                                cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_AMOUNT)),
+                                cursor.getFloat(cursor.getColumnIndex(ItemList.COLUMN_PRICE)),
+                                cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CREATED_AT)),
+                                cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_SHOPPING_LIST_ID)),
+                                cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CATEGORY))
+                        );
+                    }
+                } while (cursor.moveToNext());
+            }
+        }
+        return itemList;
     }
 }

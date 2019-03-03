@@ -366,7 +366,7 @@ public class ImageActivity extends AppCompatActivity {
                     RecommendationService p=RecommendationService.getInstance(getApplicationContext());
                     try {
                         p.updateRecommendationFromNewList(list.getId());
-                    } catch (ParseException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 

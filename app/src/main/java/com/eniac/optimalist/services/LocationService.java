@@ -103,7 +103,12 @@ public class LocationService extends Service
             try {
                 List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
                 if (addresses != null) {
-                    Address returnedAddress = addresses.get(0);
+                    Address returnedAddress;
+                    try {
+                         returnedAddress = addresses.get(0);
+                    }catch (Exception e){
+                        return null;
+                    }
                     StringBuilder strReturnedAddress = new StringBuilder("");
 
                     for (int i = 0; i <= returnedAddress.getMaxAddressLineIndex(); i++) {
@@ -181,7 +186,6 @@ public class LocationService extends Service
 
         handler.postDelayed(new Runnable(){
             public void run(){
-                //do something
                 marketList = db.getAllMarkets();
                 Market templastClosest =orderMarketList();
                 if (lastClosest!=null && templastClosest!=null && templastClosest.getTitle().equals(lastClosest.getTitle())){

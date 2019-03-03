@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -41,11 +42,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.CheckBox;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -115,6 +114,8 @@ public class MainActivity extends AppCompatActivity
         else {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         }
+            SharedPreferences settings = getApplicationContext().getSharedPreferences("settings", 0);
+            serviceStatus=settings.getBoolean("backgroundswitch",true);
         if (serviceStatus) {
             startService(locationIntent);
             Log.d("MyLocation:","hey");
