@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.eniac.optimalist.activities.ItemActivity;
+
 
 public class NotificationSystem {
     private static NotificationSystem notifyManager;
@@ -26,7 +28,12 @@ public class NotificationSystem {
     }
 
     public void setNotification(Context context, String notificationTitle, String notificationMessage, int notificationRequestCode) {
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, ItemActivity.class);
+        String temp=notificationMessage;
+        temp=temp.replace("ShopList:","");
+        temp=temp.substring(0,temp.indexOf(":"));
+
+        intent.putExtra("id",Long.parseLong(temp));
         PendingIntent contentIntent = PendingIntent.getActivity(context, notificationRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder =
@@ -36,7 +43,6 @@ public class NotificationSystem {
                         .setColor(101)
                         .setContentText(notificationMessage)
                         .addAction( R.drawable.common_google_signin_btn_icon_dark,"Go To Shopping List", contentIntent)
-                        .addAction( R.drawable.common_google_signin_btn_icon_dark,"Delete Reminder", contentIntent)
                 ;
 
         builder.setContentIntent(contentIntent);

@@ -43,7 +43,7 @@ public class RecommendationService {
         db = DBHelper.getInstance(p.getApplicationContext());
         ra=new RecommendationActivity();
         calendar=(HashMap<Integer,List<ItemList>>)db.getHashMap("key");
-        itemDate=(HashMap<Long,Integer>)db.getHashMap("key");
+        itemDate=(HashMap<Long,Integer>)db.getHashMap("key1");
         if (calendar==null){
             calendar=new HashMap<Integer,List<ItemList>>(365);
             db.saveHashMap("key",calendar);
@@ -54,6 +54,7 @@ public class RecommendationService {
 
         }
         items=db.getAllItemLists();
+
     }
     private List<ItemList> items;
 
@@ -129,7 +130,7 @@ public class RecommendationService {
     public void setRecommendationDate(ItemList e,int day){
         Calendar c=Calendar.getInstance();
         int a=c.get(Calendar.DAY_OF_YEAR);
-        List<ItemList> p=calendar.get(a+day);
+        List<ItemList> p=calendar.get(day);
         if (p==null){
             p=new ArrayList<ItemList>() ;
         }
@@ -165,14 +166,22 @@ public class RecommendationService {
         }
         Log.d("MyLocation:e",""+p.toString());
         HashMap<String, Integer> myMap=ra.sendPost(p);
-        for (String e:myMap.keySet()){
-            ItemList item=db.findItemByTitle(e);
-            if (item!=null) {
-                checkPreviousDates(item, myMap.get(e));
-                setRecommendationDate(item, myMap.get(e));
-            }
+        while(ra.d==null) {
+            ;
         }
-        //Log.d("MyLocation:e",""+calendar.get(117).get(0).getTitle());
+            myMap=ra.d;
+            ra.cancel(true);
+            for (String e : myMap.keySet()) {
+                ItemList item = db.findItemByTitle(e);
+                if (item != null) {
+                    checkPreviousDates(item, myMap.get(e));
+                    setRecommendationDate(item, myMap.get(e));
+                }
+            }
+
+        //Log.d("MyLocation:e",""+calendar.get(70));
+
+
 
     }
 

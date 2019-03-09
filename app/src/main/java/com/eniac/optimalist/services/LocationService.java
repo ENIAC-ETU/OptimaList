@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static java.lang.Thread.sleep;
+
 public class LocationService extends Service
 {
     private static final String TAG = "MyLocation";
@@ -91,7 +93,7 @@ public class LocationService extends Service
             float distance=A.distanceTo(B);
             ReminderModel m=db.getMarketSpecificReminder(lastClosest);
             if (distance <distanceLimit && m!=null){
-                notify.setNotification(getApplicationContext(), "Reminder:"+m.getTitle(),  "ShopList:"+db.getShoppingList(m.get_shopping_list_id()).getTitle()+" Uzaklık:"+(int)distance+"metre", 1);
+                notify.setNotification(getApplicationContext(), "Reminder:"+m.getTitle(),  "ShopList:"+m.get_shopping_list_id()+":"+db.getShoppingList(m.get_shopping_list_id()).getTitle()+" Uzaklık:"+(int)distance+"metre", 1);
                 changed=false;
                 return true;
             }
@@ -173,7 +175,6 @@ public class LocationService extends Service
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
@@ -182,25 +183,32 @@ public class LocationService extends Service
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
 
-        final int delay = 60000; //milliseconds
-
-        handler.postDelayed(new Runnable(){
-            public void run(){
-                marketList = db.getAllMarkets();
-                Market templastClosest =orderMarketList();
-                if (lastClosest!=null && templastClosest!=null && templastClosest.getTitle().equals(lastClosest.getTitle())){
-                    Log.d(TAG,"didn't changed");
-                }else{
-                    lastClosest=templastClosest;
-                    Log.d(TAG,"did changed");
-                    changed=true;
-                }
-                handler.postDelayed(this, delay);
-            }
+        delayedProcess();
+        final int delay = 60000;
+        handler.postDelayed(new Runnable() {
+             public void run() {
+                 try {
+                     sleep(60000);
+                 } catch (InterruptedException e) {
+                     e.printStackTrace();
+                 }
+                 delayedProcess();
+                  handler.postDelayed(this, delay);
+             }
         }, delay);
         return START_STICKY;
     }
-
+    private void delayedProcess(){
+        marketList = db.getAllMarkets();
+        Market templastClosest =orderMarketList();
+        if (lastClosest!=null && templastClosest!=null && templastClosest.getTitle().equals(lastClosest.getTitle())){
+            Log.d(TAG,"didn't changed");
+        }else{
+            lastClosest=templastClosest;
+            Log.d(TAG,"did changed");
+            changed=true;
+        }
+    }
     @Override
     public void onCreate()
     {
