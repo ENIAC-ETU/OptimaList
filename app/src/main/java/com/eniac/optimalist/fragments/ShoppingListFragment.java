@@ -165,10 +165,10 @@ public class ShoppingListFragment extends Fragment implements DatePickerDialog.O
      * Inserting new shopping list in db
      * and refreshing the list
      */
-    private void createShoppingList(String title) {
+    private void createShoppingList(String title,int marketId) {
         // inserting shopping list in db and getting
         // newly inserted shopping list id
-        long id = db.insertShoppingList(title);
+        long id = db.insertShoppingList(title,marketId);
 
         // get the newly inserted shopping list from db
         ShoppingList l = db.getShoppingList(id);
@@ -188,10 +188,11 @@ public class ShoppingListFragment extends Fragment implements DatePickerDialog.O
      * Updating shopping list in db and updating
      * item in the list by its position
      */
-    private void updateShoppingList(String title, int position) {
+    private void updateShoppingList(String title,int marketId, int position) {
         ShoppingList l = shoppingLists.get(position);
         // updating shopping list title
         l.setTitle(title);
+        l.setMarketId(marketId);
 
         // updating note in db
         db.updateShoppingList(l);
@@ -257,6 +258,11 @@ public class ShoppingListFragment extends Fragment implements DatePickerDialog.O
         TextView dialogTitle = view.findViewById(R.id.dialog_title);
         dialogTitle.setText(!shouldUpdate ? getString(R.string.lbl_new_shopping_list_title) : getString(R.string.lbl_edit_shopping_list_title));
 
+        final Spinner spinner = (Spinner) view.findViewById(R.id.shopping_list_markets_spinner);
+        ArrayAdapter<Market> dataAdapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, markets);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(dataAdapter);
+
         if (shouldUpdate && shoppingList != null) {
             inputShoppingList.setText(shoppingList.getTitle());
         }
@@ -287,14 +293,16 @@ public class ShoppingListFragment extends Fragment implements DatePickerDialog.O
                 } else {
                     alertDialog.dismiss();
                 }
-
+                int marketId=0; // assigning zero to market id if there is no market
+                if(spinner.getSelectedItem()!=null)
+                    marketId=(int)((Market)spinner.getSelectedItem()).getId();
                 // check if user updating note
                 if (shouldUpdate && shoppingList != null) {
                     // update note by it's id
-                    updateShoppingList(inputShoppingList.getText().toString(), position);
+                    updateShoppingList(inputShoppingList.getText().toString(),marketId, position);
                 } else {
                     // create new note
-                    createShoppingList(inputShoppingList.getText().toString());
+                    createShoppingList(inputShoppingList.getText().toString(),marketId);
                 }
             }
         });

@@ -150,7 +150,7 @@ public class RecommendationService {
         Log.d("MyLocation:","ReminderID:"+reminderId+"");
         if(reminderId!=-1)
             db.deleteShoppingList(db.getShoppingList(reminderId));
-        reminderId=db.insertShoppingList("Recommended");
+        reminderId=db.insertShoppingList("Recommended",0);
         if (getRecommendedList()!=null)
         for (ItemList e:getRecommendedList()){
             db.insertItemList(e.getTitle(),1,1.8f,"Kategori Yok(recomm)",reminderId);

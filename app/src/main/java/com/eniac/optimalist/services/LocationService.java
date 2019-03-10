@@ -187,13 +187,8 @@ public class LocationService extends Service
         final int delay = 60000;
         handler.postDelayed(new Runnable() {
              public void run() {
-                 try {
-                     sleep(60000);
-                 } catch (InterruptedException e) {
-                     e.printStackTrace();
-                 }
                  delayedProcess();
-                  handler.postDelayed(this, delay);
+                 handler.postDelayed(this, delay);
              }
         }, delay);
         return START_STICKY;

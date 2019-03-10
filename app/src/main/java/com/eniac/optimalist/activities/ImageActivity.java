@@ -503,7 +503,7 @@ public class ImageActivity extends AppCompatActivity {
 
         // inserting shopping list in db and getting
         // newly inserted shopping list id
-        long id = db.insertShoppingList(name);
+        long id = db.insertShoppingList(name,0);
 
         // get the newly inserted shopping list from db
         ShoppingList list = db.getShoppingList(id);

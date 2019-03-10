@@ -60,10 +60,11 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public long insertShoppingList(String title) {
+    public long insertShoppingList(String title,int marketId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(ShoppingList.COLUMN_TITLE, title);
+        contentValues.put(ShoppingList.COLUMN_MARKET_ID,(long)marketId);
         return db.insert(ShoppingList.TABLE_NAME, null, contentValues);
     }
 
@@ -76,7 +77,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 shoppingList = new ShoppingList(
                         cursor.getLong(cursor.getColumnIndex(ShoppingList.COLUMN_ID)),
                         cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_TITLE)),
-                        cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_CREATED_AT))
+                        cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_CREATED_AT)),
+                        cursor.getLong(cursor.getColumnIndex(ShoppingList.COLUMN_MARKET_ID))
                 );
             }
         }
@@ -89,6 +91,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(shoppingList.COLUMN_TITLE, shoppingList.getTitle());
+        values.put(ShoppingList.COLUMN_MARKET_ID,shoppingList.getMarketId());
         // updating row
         return db.update(ShoppingList.TABLE_NAME, values, ShoppingList.COLUMN_ID + " = " + shoppingList.getId(), null);
     }
@@ -113,7 +116,8 @@ public class DBHelper extends SQLiteOpenHelper {
                     shoppingLists.add(new ShoppingList(
                                     cursor.getLong(cursor.getColumnIndex(ShoppingList.COLUMN_ID)),
                                     cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_TITLE)),
-                                    cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_CREATED_AT))
+                                    cursor.getString(cursor.getColumnIndex(ShoppingList.COLUMN_CREATED_AT)),
+                                    cursor.getLong(cursor.getColumnIndex(ShoppingList.COLUMN_MARKET_ID))
                             )
                     );
                 } while (cursor.moveToNext());
