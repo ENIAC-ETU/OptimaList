@@ -319,7 +319,7 @@ public class ImageActivity extends AppCompatActivity {
                 if (!item.isUsed()) {
                     String s = line.toString().toLowerCase();
                     if (s.contains("tarih") | s.contains("tarıh")) {
-                        Pattern p = Pattern.compile("\\d\\d\\.\\d\\d\\.\\d\\d\\d?\\d?");
+                        Pattern p = Pattern.compile("\\d\\d[\\.|/]\\d\\d[\\.|/]\\d\\d\\d?\\d?");
                         Matcher m = p.matcher(s);
                         if (m.find()) {
                             date = s.substring(m.start(), m.end());
