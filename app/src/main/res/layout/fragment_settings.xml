@@ -17,4 +17,16 @@
         tools:layout_editor_absoluteY="16dp"
         tools:ignore="MissingConstraints" />
 
+    <Switch
+        android:id="@+id/recommendEveryday"
+        android:layout_width="350dp"
+        android:layout_height="71dp"
+        android:layout_marginTop="8dp"
+        android:text="Recommend Everyday"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/backgroundSwitch"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="17dp" />
+
 </android.support.constraint.ConstraintLayout>

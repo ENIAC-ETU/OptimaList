@@ -116,11 +116,11 @@ public class MainActivity extends AppCompatActivity
         }
             SharedPreferences settings = getApplicationContext().getSharedPreferences("settings", 0);
             serviceStatus=settings.getBoolean("backgroundswitch",true);
-        if (serviceStatus) {
-            startService(locationIntent);
-            Log.d("MyLocation:","hey");
             p1=RecommendationService.getInstance(getApplicationContext());
             p1.createReminderFromRecom();
+            if (serviceStatus) {
+            startService(locationIntent);
+            Log.d("MyLocation:","hey");
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame, new ShoppingListFragment());

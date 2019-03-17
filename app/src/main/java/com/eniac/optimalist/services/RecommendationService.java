@@ -1,18 +1,12 @@
 package com.eniac.optimalist.services;
 
-import android.app.Service;
-import android.content.ClipData;
 import android.content.Context;
-import android.content.Intent;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.eniac.optimalist.activities.RecommendationActivity;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ItemList;
 import com.eniac.optimalist.database.model.ShoppingList;
-import com.eniac.optimalist.fragments.ReminderFragment;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -20,10 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.HashMap;
-import java.util.Map;
 
 public class RecommendationService {
     private static DBHelper db;
@@ -106,20 +98,8 @@ public class RecommendationService {
     public List<ItemList> getRecommendedList(){
         Calendar c=Calendar.getInstance();
         int a=c.get(Calendar.DAY_OF_YEAR);
-
-        /*List<ItemList> newList=new ArrayList<>();
-        List<String> nameList=new ArrayList<>();
-        Iterator it = itemScore.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            if ((Integer)pair.getValue()>threshold){
-                ItemList p=(ItemList)pair.getKey();
-                if (!nameList.contains(p.getTitle())){
-                    newList.add( p);
-                    nameList.add(p.getTitle());
-                }
-            }
-        }*/
+        if (calendar.get(a)!=null)
+        Log.d("MyLocationab",""+calendar.get(a).toString());
         return calendar.get(a);
     }
     public List<Integer> getDateList(ItemList item) throws ParseException {
@@ -151,46 +131,70 @@ public class RecommendationService {
         if(reminderId!=-1)
             db.deleteShoppingList(db.getShoppingList(reminderId));
         reminderId=db.insertShoppingList("Recommended",0);
-        if (getRecommendedList()!=null)
-        for (ItemList e:getRecommendedList()){
-            db.insertItemList(e.getTitle(),1,1.8f,"Kategori Yok(recomm)",reminderId);
+        List<ItemList> p=db.getCurrentItems(reminderId);
+        for(ItemList e:p){
+            db.deleteItem(e);
+        }
+        if (getRecommendedList()!=null){
+            for (ItemList e:getRecommendedList()){
+                db.insertItemList(e.getTitle(),1,10000,"Kategori Yok(recomm)",reminderId);
+            }
         }
     }
-
+    private HashMap<String,List<Integer>> p;
     public void updateRecommendationFromNewList(long id) throws Exception {
         List<ItemList> temp=db.getCurrentItems(id);
-        HashMap<String,List<Integer>> p=new HashMap<>();
+        p=new HashMap<>();
         for (ItemList e:temp){
             p.put(e.getTitle(),getDateList(e));
             //setRecommendationDate(e,59);
         }
         Log.d("MyLocation:e",""+p.toString());
-        HashMap<String, Integer> myMap=ra.sendPost(p);
-        while(ra.d==null) {
-            ;
-        }
-            myMap=ra.d;
-            ra.cancel(true);
-            for (String e : myMap.keySet()) {
-                ItemList item = db.findItemByTitle(e);
-                if (item != null) {
-                    checkPreviousDates(item, myMap.get(e));
-                    setRecommendationDate(item, myMap.get(e));
+        new Thread(new Runnable() {
+            public void run(){
+                HashMap<String, Integer> myMap= null;
+                try {
+                    myMap = ra.execute(p).get();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }
 
+                if (myMap!=null) {
+                    for (String e : myMap.keySet()) {
+                        ItemList item = db.findItemByTitle(e);
+                        if (item != null) {
+                            checkPreviousDates(item, myMap.get(e));
+                            setRecommendationDate(item, myMap.get(e));
+                        }
+                    }
+                }
+                else{
+                    Log.d("MyLocation:e","mymapnull");
+                   }
         //Log.d("MyLocation:e",""+calendar.get(70));
-
-
+            }
+        }).start();
 
     }
 
     private void checkPreviousDates(ItemList item,Integer e) {
-        if (itemDate.get(item.getId())!=null && calendar.get(item.getId())!=null){
+        Log.d("MyLocation",""+item.getId());
+        Log.d("MyLocation",""+item.getTitle());
+        Log.d("MyLocation",""+e);
+        Log.d("MyLocation",""+itemDate.get(item.getId()));
+        //Log.d("MyLocation",""+itemDate.get(4));
+
+        if (itemDate.get(item.getId())!=null){
+            Log.d("MyLocation","hehe");
             int latestDay=itemDate.get(item.getId());
             calendar.get(latestDay).remove(item);
-            db.saveHashMap("key1",itemDate);
+            Log.d("MyLocation",""+calendar.get(latestDay).toString());
+            Log.d("MyLocation",""+calendar.get(latestDay));
+            Log.d("MyLocation","itemdate="+latestDay);
+
         }
         itemDate.put(item.getId(),e);
+        db.saveHashMap("key",calendar);
+        db.saveHashMap("key1",itemDate);
     }
 }

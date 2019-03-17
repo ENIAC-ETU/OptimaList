@@ -442,6 +442,30 @@ public class DBHelper extends SQLiteOpenHelper {
         Collections.sort(itemLists);
         return itemLists;
     }
+    public ItemList lowestMarketAndPrice(ItemList itemList)  {
+        List<ItemList> itemLists = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        try (Cursor cursor = db.query(ItemList.TABLE_NAME, null, ItemList.COLUMN_TITLE + " = " + "'"+itemList.getTitle()+"'", null, null, null, ItemList.COLUMN_PRICE + " asc")){
+            if (cursor.moveToFirst()) {
+                do {
+                    if (cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)).equals(itemList.getTitle())) {
+                        itemLists.add(new ItemList(
+                                        cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_ID)),
+                                        cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_TITLE)),
+                                        cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_AMOUNT)),
+                                        cursor.getFloat(cursor.getColumnIndex(ItemList.COLUMN_PRICE)),
+                                        cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CREATED_AT)),
+                                        cursor.getInt(cursor.getColumnIndex(ItemList.COLUMN_SHOPPING_LIST_ID)),
+                                        cursor.getString(cursor.getColumnIndex(ItemList.COLUMN_CATEGORY))
+                                )
+                        );
+                    }
+                } while (cursor.moveToNext());
+            }
+        }
+        return itemLists.get(0);
+    }
     public void saveHashMap(String key , Object obj) {
         SharedPreferences prefs = mainContext.getSharedPreferences("prefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();

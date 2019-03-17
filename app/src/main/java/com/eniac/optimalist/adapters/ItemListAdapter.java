@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.eniac.optimalist.R;
+import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ItemList;
 
 import java.text.ParseException;
@@ -51,11 +52,21 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.MyView
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         ItemList itemList = itemLists.get(position);
-
-        if(itemList.getPrice()>0) {
-            holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle() + " Fiyat: " + itemList.getPrice()+ " Kategori: "+itemList.getCategory());
-        }else{
-            holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle()+ " Kategori: "+itemList.getCategory());
+        DBHelper db=DBHelper.getInstance(context);
+        if (db.getShoppingList(itemList.getShoppingListId()).getTitle().equals("Recommended")){
+            ItemList e=db.lowestMarketAndPrice(itemList);
+            if (db.getShoppingList(e.getShoppingListId())!=null && db.getMarket(db.getShoppingList(e.getShoppingListId()).getMarketId())!=null) {
+                holder.itemList.setText(itemList.getTitle() + " Fiyat: " + e.getPrice() + " En Uygun Market: " + db.getMarket(db.getShoppingList(e.getShoppingListId()).getMarketId()).getTitle());
+            }else {
+                holder.itemList.setText(itemList.getTitle() + " Fiyat: " + e.getPrice() + " En Uygun Market: " + "Yok");
+            }
+        }
+        else {
+            if (itemList.getPrice() > 0) {
+                holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle() + " Fiyat: " + itemList.getPrice() + " Kategori: " + itemList.getCategory());
+            } else {
+                holder.itemList.setText(itemList.getAmount() + " Adet " + itemList.getTitle() + " Kategori: " + itemList.getCategory());
+            }
         }
 
         // Displaying dot from HTML character code

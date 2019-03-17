@@ -21,55 +21,15 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class RecommendationActivity extends AsyncTask<String, Void, HashMap<String,Integer>> {
+public class RecommendationActivity extends AsyncTask<HashMap<String,List<Integer>>, Void, HashMap<String,Integer>> {
     private final String serverAddress="https://optimalist-server.herokuapp.com/get-prediction/";
     HashMap<String,List<Integer>> obj;
     public HashMap<String,Integer> d;
-        public HashMap<String,Integer> sendPost(HashMap<String,List<Integer>> a) throws IOException {
-            obj=a;
-            Thread thread = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try  {
-                        doInBackground(serverAddress);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            thread.start();
-            return d;
-        }
-
-    public String convertStreamToString(InputStream is) {
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append((line + "\n"));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return sb.toString();
-    }
 
     @Override
-    public HashMap<String, Integer> doInBackground(String... strings) {
+    public HashMap<String, Integer> doInBackground(HashMap<String,List<Integer>>... strings) {
         Gson gson=new Gson();
-        String json=gson.toJson(obj);
+        String json=gson.toJson(strings[0]);
         InputStream inputStream;
         HttpURLConnection urlConnection;
         byte[] outputBytes;
@@ -96,9 +56,6 @@ public class RecommendationActivity extends AsyncTask<String, Void, HashMap<Stri
             { response.append(inputLine); }
             in.close();
             Log.d("MyLocation::",""+response);
-            /*inputStream = new BufferedInputStream(urlConnection.getInputStream());
-            responseData = convertStreamToString(inputStream);*/
-            //Log.d("MyLocation::",""+responseData);
             Type type = new TypeToken<HashMap<String, Integer>>(){}.getType();
             myMap = gson.fromJson(response.toString(), type);
             Log.d("MyLocation::",""+myMap.toString());
