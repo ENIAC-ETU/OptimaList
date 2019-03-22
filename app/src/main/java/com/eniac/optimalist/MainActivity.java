@@ -29,13 +29,16 @@ import android.support.v4.app.NotificationCompat;
 
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ReminderModel;
+import com.eniac.optimalist.database.model.ShoppingList;
 import com.eniac.optimalist.fragments.MarketFragment;
+import com.eniac.optimalist.fragments.RecommFragment;
 import com.eniac.optimalist.fragments.ReminderFragment;
 import com.eniac.optimalist.fragments.SettingFragment;
 import com.eniac.optimalist.fragments.ShoppingListFragment;
 import com.eniac.optimalist.services.AlertReminder;
 import com.eniac.optimalist.services.LocationService;
 import com.eniac.optimalist.services.RecommendationService;
+import com.google.gson.Gson;
 
 import android.Manifest;
 import android.content.Intent;
@@ -47,6 +50,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -58,7 +62,7 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer;
     private boolean serviceStatus=true;
     public static Intent locationIntent;
-    private RecommendationService p1;
+    public static RecommendationService p1;
     boolean mBound = false;
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -118,6 +122,9 @@ public class MainActivity extends AppCompatActivity
             serviceStatus=settings.getBoolean("backgroundswitch",true);
             p1=RecommendationService.getInstance(getApplicationContext());
             p1.createReminderFromRecom();
+            Log.d("MyLocation","p1:"+p1);
+//set variables of 'myObject', etc.
+
             if (serviceStatus) {
             startService(locationIntent);
             Log.d("MyLocation:","hey");
@@ -214,9 +221,11 @@ public class MainActivity extends AppCompatActivity
             ft.replace(R.id.content_frame, new ReminderFragment());
         } else if (id == R.id.nav_manage) {
             ft.replace(R.id.content_frame, new SettingFragment());
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_recommendation) {
+            Log.d("MyLocation","aa"+((HashMap<Long,Integer>)db.getHashMap("key1")));
+            Log.d("MyLocation","bb"+p1.getItemDate());
 
-        } else if (id == R.id.nav_send) {
+            ft.replace(R.id.content_frame, new RecommFragment());
 
         }
 
@@ -260,4 +269,5 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
 }

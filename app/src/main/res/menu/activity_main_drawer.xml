@@ -6,33 +6,24 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_shopping_lists"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/shopping_list_icon"
             android:title="Alışveriş Listelerim" />
         <item
             android:id="@+id/nav_markets"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/market_icon"
             android:title="Marketlerim" />
         <item
             android:id="@+id/nav_reminders"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/reminder_icon"
             android:title="Hatırlatıcılar" />
+        <item
+            android:id="@+id/nav_recommendation"
+            android:icon="@drawable/recommendation_icon"
+            android:title="Öneri Tarihleri" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Settings" />
+            android:title="Ayarlar" />
     </group>
-
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
-        </menu>
-    </item>
 
 </menu>

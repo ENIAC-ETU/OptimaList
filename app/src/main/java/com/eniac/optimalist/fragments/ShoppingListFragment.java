@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 
 //import android.support.design.widget.FloatingActionButton;
 import com.eniac.optimalist.activities.ImageActivity;
+import com.eniac.optimalist.services.RecommendationService;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
@@ -225,7 +226,7 @@ public class ShoppingListFragment extends Fragment implements DatePickerDialog.O
      * Delete - 0
      */
     private void showActionsDialog(final int position) {
-        CharSequence colors[] = new CharSequence[]{"Düzenle", "Hatırlatıcı ekle", "Sil"};
+        CharSequence colors[] = new CharSequence[]{"Düzenle", "Hatırlatıcı ekle", "Öneri Listesine Ekle","Sil"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Bir seçenek seçiniz");
@@ -237,6 +238,14 @@ public class ShoppingListFragment extends Fragment implements DatePickerDialog.O
                 }
                 else if (which == 1){
                     showReminderDialog(position);
+                }else if (which==2){
+                    RecommendationService p=RecommendationService.getInstance(getContext());
+                    Log.d("MyLocation","p:"+p);
+                    try {
+                        p.updateRecommendationFromNewList(shoppingLists.get(position).getId());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 else {
                     deleteShoppingList(position);

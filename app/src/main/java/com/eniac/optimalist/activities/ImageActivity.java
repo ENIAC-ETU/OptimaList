@@ -1,6 +1,5 @@
 package com.eniac.optimalist.activities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -58,7 +57,6 @@ import com.google.api.services.vision.v1.model.Word;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -85,7 +83,6 @@ public class ImageActivity extends AppCompatActivity {
     private static final String[] items = new String[] {
             "Kahve","Yumurta","Süt","Domates", "Peynir"
     };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -354,7 +351,6 @@ public class ImageActivity extends AppCompatActivity {
             dateText.setText(date);
             Button acceptOCR = (Button) findViewById(R.id.acceptOCR);
 
-
             acceptOCR.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -363,12 +359,8 @@ public class ImageActivity extends AppCompatActivity {
                     ShoppingList list=createShoppingListFromOCR(listName.getText().toString(),OCRAdapter.ocrParsedItemList);
                     setResult((int)list.getId());
                     finish();
-                    RecommendationService p=RecommendationService.getInstance(getApplicationContext());
-                    try {
-                        p.updateRecommendationFromNewList(list.getId());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+
+
 
                 }
             });
