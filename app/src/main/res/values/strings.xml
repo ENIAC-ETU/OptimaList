@@ -18,6 +18,7 @@
     <string name="hint_enter_item_name">Eklenecek ürünün adını giriniz!</string>
     <string name="title_activity_item">ItemActivity</string>
     <string name="msg_no_item_list">Listede ürün bulunamadı!</string>
+    <string name="msg_no_market_prices">Ürün için başka markette fiyat bulunamadı!</string>
 
     <string name="reminder">Hatırlatıcı Başlığı</string>
 

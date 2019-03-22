@@ -40,6 +40,11 @@
             android:label="@string/title_activity_item"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".activities.MarketPricesActivity"
+            android:label="@string/title_activity_item"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <receiver android:name=".services.AlertReminder"/>
 
         <service

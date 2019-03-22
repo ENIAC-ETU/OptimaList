@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.eniac.optimalist.adapters.MarketAdapter;
 import com.eniac.optimalist.database.model.Market;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -27,8 +26,6 @@ import com.eniac.optimalist.R;
 import com.eniac.optimalist.adapters.ItemListAdapter;
 import com.eniac.optimalist.database.DBHelper;
 import com.eniac.optimalist.database.model.ItemList;
-import com.eniac.optimalist.database.model.ShoppingList;
-import com.eniac.optimalist.fragments.ShoppingListFragment;
 import com.eniac.optimalist.utils.DividerItemDecoration;
 import com.eniac.optimalist.utils.RecyclerTouchListener;
 
@@ -44,6 +41,9 @@ public class ItemActivity extends AppCompatActivity {
     private TextView noItemListView;
     private List<Market> markets = new ArrayList<>();
     private long shop_id=-1;
+    public static long currentPositionId;
+    public static String currentItemsTitle;
+
 
     public AutoCompleteTextView text;
 
@@ -112,16 +112,28 @@ public class ItemActivity extends AppCompatActivity {
                 recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, final int position) {
-                showActionsDialog(position);
+
+                ItemList i = itemLists.get(position);
+                currentPositionId = i.getId();
+                currentItemsTitle = i.getTitle();
+                showMarketPricesActivity();
+
             }
 
             @Override
             public void onLongClick(View view, int position) {
-
+                showActionsDialog(position);
             }
         }));
 
 
+
+    }
+    public void showMarketPricesActivity(){
+
+        Intent intent = new Intent(getApplicationContext(), MarketPricesActivity.class);
+        intent.putExtra("id",currentPositionId);
+        startActivity(intent);
 
     }
 
