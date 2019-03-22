@@ -28,12 +28,15 @@ public class NotificationSystem {
     }
 
     public void setNotification(Context context, String notificationTitle, String notificationMessage, int notificationRequestCode) {
-        Intent intent = new Intent(context, ItemActivity.class);
         String temp=notificationMessage;
-        temp=temp.replace("ShopList:","");
-        temp=temp.substring(0,temp.indexOf(":"));
+        Intent     intent= new Intent(context, ItemActivity.class);
 
-        intent.putExtra("id",Long.parseLong(temp));
+            temp=temp.replace("ShopList:","");
+            temp=temp.substring(0,temp.indexOf(":"));
+            String replacable="ShopList:"+temp+":";
+            notificationMessage=notificationMessage.substring(notificationMessage.indexOf(replacable)+replacable.length(),notificationMessage.length());
+            intent.putExtra("id",Long.parseLong(temp));
+
         PendingIntent contentIntent = PendingIntent.getActivity(context, notificationRequestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder =

@@ -20,6 +20,14 @@ import android.widget.TimePicker;
 import com.eniac.optimalist.MainActivity;
 import com.eniac.optimalist.R;
 import com.eniac.optimalist.database.DBHelper;
+import com.eniac.optimalist.database.model.ShoppingList;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class SettingFragment extends Fragment {
     private Switch backgroundSwitch;
@@ -85,22 +93,86 @@ public class SettingFragment extends Fragment {
                             Context context=getContext();
                             int hour = timePicker.getHour();
                             int minute = timePicker.getMinute();
+                            Log.d("MyLocation","hour:"+hour);
                             SharedPreferences settings = context.getSharedPreferences("time_settings", 0);
                             SharedPreferences settings1 = context.getSharedPreferences("time_settings1", 0);
+                            SharedPreferences reminder = context.getSharedPreferences("recom_reminder", 0);
 
                             SharedPreferences.Editor editor = settings.edit();
                             SharedPreferences.Editor editor1 = settings1.edit();
+                            SharedPreferences.Editor editor2 = reminder.edit();
+
+                            long id=reminder.getLong("recom_reminder",-1);
+
+                            DBHelper db=DBHelper.getInstance(getContext());
+                            Log.d("MyLocation","id:"+id);
+                            if (id!=-1){
+                                db.deleteReminder(db.getReminder(id));
+                            }
+                            List<ShoppingList> temp=db.getAllShoppingLists();
+                            long reminderId=-1;
+                            for (ShoppingList e:temp){
+                                if(e.getTitle().equals("Recommended")){
+                                    reminderId=e.getId();
+                                }
+                            }
+                            Calendar c=Calendar.getInstance();
+                            int subtractHour=hour-c.get(Calendar.HOUR_OF_DAY);
+                            int subtractMinute=minute-c.get(Calendar.MINUTE);
+                            int month=c.get(Calendar.MONTH)+1;
+
+
+                            if(subtractHour>0 ||(subtractHour==0 && subtractMinute>0)){
+                                c.add(Calendar.HOUR_OF_DAY,subtractHour);
+                                if (minute<0)
+                                c.add(Calendar.MINUTE,60+subtractMinute);
+                                else
+                                    c.add(Calendar.MINUTE,subtractMinute);
+                                Log.d("MyLocation","houra:"+c.get(Calendar.HOUR_OF_DAY));
+
+                            }else{
+                                c.set(Calendar.DAY_OF_YEAR,c.get(Calendar.DAY_OF_YEAR)+1);
+                                c.set(Calendar.HOUR_OF_DAY,0);
+                                c.set(Calendar.MINUTE,0);
+                                c.add(Calendar.HOUR_OF_DAY,hour);
+                                c.add(Calendar.MINUTE,minute);
+                                Log.d("MyLocation","hourb:"+c.get(Calendar.HOUR_OF_DAY));
+
+                            }
+                            c.set(Calendar.SECOND,0);
+                            Date date = c.getTime();
+                            String strDate=c.get(Calendar.YEAR)+"-"+month+"-"+c.get(Calendar.DAY_OF_MONTH)+" "+c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE)+":00";
+                            Log.d("MyLocation","date:"+strDate);
+                            id=db.insertReminder("Recommended",reminderId,-1,strDate);
+                            ((MainActivity)getActivity()).updateAlarms();
+
+
 
                             editor.putInt("time_settings",hour);
                             editor1.putInt("time_settings1",minute);
-
+                            editor2.putLong("recom_reminder",id);
                             editor.commit();
                             editor1.commit();
+                            editor2.commit();
+
                             alertDialog.dismiss();
                         }
                     });
 
                     alertDialog.show();
+
+                }else{
+                    SharedPreferences reminder = context.getSharedPreferences("recom_reminder", 0);
+                    long id=reminder.getLong("recom_reminder",-1);
+                    SharedPreferences.Editor editor2 = reminder.edit();
+
+                    DBHelper db=DBHelper.getInstance(getContext());
+                    Log.d("MyLocation","id:"+id);
+                    if (id!=-1){
+                        db.deleteReminder(db.getReminder(id));
+                    }
+                    editor2.putLong("recom_reminder",-1);
+                    editor2.commit();
 
                 }
             }

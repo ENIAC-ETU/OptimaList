@@ -6,10 +6,12 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -119,6 +121,17 @@ public class ReminderFragment extends Fragment implements DatePickerDialog.OnDat
      * item from the list by its position
      */
     private void deleteReminder(int position) {
+        SharedPreferences reminder = getContext().getSharedPreferences("recom_reminder", 0);
+        Long redid=reminder.getLong("recom_reminder",-1);
+        if (reminders.get(position).getId()== redid && redid!=-1){
+            SharedPreferences rec_settings = getContext().getSharedPreferences("rec_settings", 0);
+            SharedPreferences.Editor edit1=rec_settings.edit();
+            edit1.putBoolean("recommendSwitch",false);
+            edit1.commit();
+            SharedPreferences.Editor edit2=reminder.edit();
+            edit2.putLong("recom_reminder",-1);
+            edit2.commit();
+        }
         // deleting the reminder from db
         db.deleteReminder(reminders.get(position));
 

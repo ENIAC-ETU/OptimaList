@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity
             startService(locationIntent);
             Log.d("MyLocation:","hey");
         }
+        updateAlarms();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_frame, new ShoppingListFragment());
         ft.commit();
@@ -260,6 +261,9 @@ public class MainActivity extends AppCompatActivity
                 if(date.before(Calendar.getInstance().getTime()))
                     continue;
                 intent.putExtra("send_rem_title",rem.getTitle());
+                intent.putExtra("send_shop_id",rem.get_shopping_list_id());
+                intent.putExtra("send_rem_id",rem.getId());
+
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),1,intent,PendingIntent.FLAG_UPDATE_CURRENT);
                 SimpleDateFormat fmtOut = new SimpleDateFormat("d MMM yyyy - HH:mm:ss");
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,c.getTimeInMillis(),pendingIntent);
