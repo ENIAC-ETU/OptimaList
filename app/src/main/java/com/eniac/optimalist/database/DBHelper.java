@@ -68,6 +68,15 @@ public class DBHelper extends SQLiteOpenHelper {
         return db.insert(ShoppingList.TABLE_NAME, null, contentValues);
     }
 
+    public long insertShoppingList(String title, int marketId, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ShoppingList.COLUMN_TITLE, title);
+        contentValues.put(ShoppingList.COLUMN_MARKET_ID,(long)marketId);
+        contentValues.put(ShoppingList.COLUMN_CREATED_AT, date);
+        return db.insert(ShoppingList.TABLE_NAME, null, contentValues);
+    }
+
     public ShoppingList getShoppingList(long id) {
         SQLiteDatabase db = this.getReadableDatabase();
         ShoppingList shoppingList = null;
@@ -297,6 +306,18 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(ItemList.COLUMN_AMOUNT,amount);
         contentValues.put(ItemList.COLUMN_PRICE,price);
         contentValues.put(ItemList.COLUMN_CATEGORY,category);
+        return db.insert(ItemList.TABLE_NAME, null, contentValues);
+    }
+
+    public long insertItemList(String title,int amount,float price, String category, long currentPositionId, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ItemList.COLUMN_TITLE, title);
+        contentValues.put(ItemList.COLUMN_SHOPPING_LIST_ID,currentPositionId);
+        contentValues.put(ItemList.COLUMN_AMOUNT,amount);
+        contentValues.put(ItemList.COLUMN_PRICE,price);
+        contentValues.put(ItemList.COLUMN_CATEGORY,category);
+        contentValues.put(ItemList.COLUMN_CREATED_AT,  date);
         return db.insert(ItemList.TABLE_NAME, null, contentValues);
     }
 

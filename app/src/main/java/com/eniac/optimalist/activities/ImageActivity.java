@@ -356,7 +356,7 @@ public class ImageActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     Log.d("PatternMatch", "Date: " + dateText.getText() + ", Parsed items: " + OCRAdapter.ocrParsedItemList.toString());
 
-                    ShoppingList list=createShoppingListFromOCR(listName.getText().toString(),OCRAdapter.ocrParsedItemList);
+                    ShoppingList list = createShoppingListFromOCR(listName.getText().toString(), OCRAdapter.ocrParsedItemList, dateText.getText().toString());
                     setResult((int)list.getId());
                     finish();
 
@@ -490,18 +490,20 @@ public class ImageActivity extends AppCompatActivity {
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
 
-    public ShoppingList createShoppingListFromOCR(String name, List<OCRParsedItem> parsedItems){
+    public ShoppingList createShoppingListFromOCR(String name, List<OCRParsedItem> parsedItems, String date){
         //creates a new shopping list
 
+        String[] dateArr = date.split("\\.", 3);
+        String formattedDate = dateArr[2] + "-" + dateArr[1] + "-" + dateArr[0] + " 00:00:00";
         // inserting shopping list in db and getting
         // newly inserted shopping list id
-        long id = db.insertShoppingList(name,0);
+        long id = db.insertShoppingList(name,0, formattedDate);
 
         // get the newly inserted shopping list from db
         ShoppingList list = db.getShoppingList(id);
 
         for(OCRParsedItem item:parsedItems) {
-            long itemId =db.insertItemList(item.getName(),1 , Float.parseFloat(item.getPrice()),item.getCategory(),list.getId());
+            long itemId = db.insertItemList(item.getName(),1 , Float.parseFloat(item.getPrice()),item.getCategory(),list.getId(), formattedDate);
         }
         return list;
     }

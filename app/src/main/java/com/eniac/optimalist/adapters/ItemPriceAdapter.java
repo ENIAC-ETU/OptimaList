@@ -64,12 +64,14 @@ public class ItemPriceAdapter extends RecyclerView.Adapter<ItemPriceAdapter.MyVi
             }
         }
         else {
-            Market market= db.getMarket((long)db.getShoppingList((long)itemList.getShoppingListId()).getMarketId());
-            if (itemList.getPrice() > 0) {
+            Market market = db.getMarket((long)db.getShoppingList((long)itemList.getShoppingListId()).getMarketId());
+            if (market != null) {
+                if (itemList.getPrice() > 0) {
 
-                holder.itemList.setText(itemList.getTitle() + " ürünü bu markette "+ itemList.getPrice()+" TL : "+market.getTitle() );
-            } else {
-                holder.itemList.setText(itemList.getTitle() + " ürünü için bu markette fiyat girilmemiş: "+ market.getTitle());
+                    holder.itemList.setText(itemList.getTitle() + " ürünü bu markette " + itemList.getPrice() + " TL : " + market.getTitle());
+                } else {
+                    holder.itemList.setText(itemList.getTitle() + " ürünü için bu markette fiyat girilmemiş: " + market.getTitle());
+                }
             }
         }
 
